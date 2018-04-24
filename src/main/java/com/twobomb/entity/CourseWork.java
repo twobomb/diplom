@@ -18,7 +18,12 @@ public class CourseWork extends AbstractEntity {
     private Discipline discipline;
 
 
+    public Discipline getDiscipline() {
+        return discipline;
+    }
+
     public CourseWork() {
+
     }
 
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
@@ -26,6 +31,9 @@ public class CourseWork extends AbstractEntity {
             joinColumns = @JoinColumn(name = "id_coursework"),
             inverseJoinColumns = @JoinColumn(name = "id_theme"))
     List<Theme> themes;
+
+    @OneToMany(mappedBy = "courseWork",fetch = FetchType.LAZY)
+    List<TeacherInfo> teacherInfos;
 
     public List<Theme> getThemes() {
         return themes;

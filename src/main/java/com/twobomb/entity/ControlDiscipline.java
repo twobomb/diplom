@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "discipline_control")
-public class Control_Discipline extends AbstractEntity{
+public class ControlDiscipline extends AbstractEntity{
 
     @Column(name = "date_begin")
     Date dateBegin;
@@ -16,7 +16,28 @@ public class Control_Discipline extends AbstractEntity{
     @Column(name = "date_end")
     Date dateEnd;
 
+    public ControlDiscipline(Date dateBegin, Date dateEnd, Boolean is_autoset, Boolean is_student_change, Boolean is_student_offer, Discipline discipline) {
+
+        this.dateBegin = dateBegin;
+        if(dateBegin.after(dateEnd)){
+            try {
+                throw new Exception("Date begin after date end!");
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                this.dateEnd = dateBegin;
+            }
+        }
+        else
+            this.dateEnd = dateEnd;
+        this.is_autoset = is_autoset;
+        this.is_student_change = is_student_change;
+        this.is_student_offer = is_student_offer;
+        this.discipline = discipline;
+    }
+
     @Type(type = "boolean")
+
     @Column(name = "is_autoset")
     Boolean is_autoset;
 
@@ -27,10 +48,10 @@ public class Control_Discipline extends AbstractEntity{
     Boolean is_student_offer;
 
     @JoinColumn(name = "id_discipline_load")
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     Discipline discipline;
 
-    public Control_Discipline() {
+    public ControlDiscipline() {
     }
 
     public Discipline getDiscipline() {

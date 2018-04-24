@@ -6,8 +6,6 @@ package com.twobomb.service;
         import com.twobomb.entity.User;
         import com.twobomb.repository.DiscinplineRepository;
         import com.twobomb.repository.UserRepository;
-        import org.hibernate.Session;
-        import org.hibernate.SessionFactory;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.security.crypto.password.PasswordEncoder;
         import org.springframework.stereotype.Repository;
@@ -43,7 +41,6 @@ public class UserService{
 
     public List<Discipline> getDisciplines(User user) {
         List<Discipline> res = new ArrayList<>();
-//        Session session = sessionFactory.openSession();
         try {
             switch (user.getRole().getRole()) {
                 case Role.ADMIN:
@@ -51,7 +48,6 @@ public class UserService{
                     break;
                 case Role.STUDENT:
                     Group g = user.getPerson().getGroup();
-//                    session.update(g);
                     res = g.getDisciplines();
                     break;
                 case Role.TEACHER:
@@ -69,7 +65,6 @@ public class UserService{
             e.printStackTrace();
         }
         finally {
-//            session.close();
         }
         return res;
     }

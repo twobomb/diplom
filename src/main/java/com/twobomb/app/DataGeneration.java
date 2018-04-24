@@ -1,33 +1,31 @@
 package com.twobomb.app;
 
 import com.twobomb.entity.*;
+import com.twobomb.entity.TeacherInfo;
 import com.twobomb.repository.*;
 import com.twobomb.service.DisciplineService;
-import com.twobomb.service.UserService;
+import com.twobomb.service.PersonService;
+import com.twobomb.service.UtilService;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.TransactionException;
-import org.hibernate.hql.internal.QueryTranslatorFactoryInitiator;
+import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.hibernate.*;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration;
+import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 
 @SpringComponent
-
 public class DataGeneration {
 
     UserRepository userRepository;
@@ -38,9 +36,12 @@ public class DataGeneration {
     CourseworkRepository courseworkRepository;
     PasswordEncoder passwordEncoder;
     DisciplineService disciplineService;
+    PersonService personService;
+    TeacherInfoRepository teacherInfoRepository;
+    ControlDisciplineRepository controlDisciplineRepository;
     Random rnd;
 
-    public DataGeneration(UserRepository userRepository,GroupRepository groupRepository,RoleRepository roleRepository,PersonRepository personRepository,PasswordEncoder passwordEncoder,DiscinplineRepository discinplineRepository,CourseworkRepository courseworkRepository,DisciplineService disciplineService) {
+    public DataGeneration(UserRepository userRepository,GroupRepository groupRepository,RoleRepository roleRepository,PersonRepository personRepository,PasswordEncoder passwordEncoder,DiscinplineRepository discinplineRepository,CourseworkRepository courseworkRepository,DisciplineService disciplineService,PersonService personService,TeacherInfoRepository teacherInfoRepository,ControlDisciplineRepository controlDisciplineRepository) {
     this.userRepository = userRepository;
     this.groupRepository = groupRepository;
     this.roleRepository = roleRepository;
@@ -49,6 +50,9 @@ public class DataGeneration {
     this.discinplineRepository = discinplineRepository;
     this.courseworkRepository = courseworkRepository;
     this.disciplineService = disciplineService;
+    this.personService = personService;
+    this.teacherInfoRepository = teacherInfoRepository;
+    this.controlDisciplineRepository = controlDisciplineRepository;
     rnd  = new Random();
     }
 
@@ -72,6 +76,11 @@ public class DataGeneration {
         bindTeacherToDisciplines();
         //Привязка дисциплин к группам
         bindGroupsToDisciplines();
+        //Назначение кол-ва тем которые преподаватель должен подать к каждой привязанной к нему курсовой
+        createTeacherInfoCoursework();
+
+        //Генерация рандомным дисциплинам(не всем) рандомных параметров
+        createDisciplineControl();
     }
 
     public void createPerson(){
@@ -128,6 +137,68 @@ public class DataGeneration {
                     courseworkRepository.save(new CourseWork("Курсовая по "+d.getName()+" №"+(i+1),d));
             }
         courseworkRepository.flush();
+    }
+    //Генерация рандомным дисциплинам(не всем) рандомных параметров
+    public void createDisciplineControl(){
+        List<Discipline> disciplineList  = discinplineRepository.findAll();
+        for(Discipline d:disciplineList){
+            //70% на создание параметров у дисциплины
+            if(rnd.nextDouble() < 70){
+                boolean isAutoset = rnd.nextBoolean();
+                boolean isStudentChange = rnd.nextBoolean();
+                boolean isStudentOffer =  rnd.nextBoolean();
+                Calendar c = Calendar.getInstance();
+                c.add(Calendar.DATE, rnd.nextInt(30)-15);
+                Date begin = c.getTime();
+                c.add(Calendar.DATE, rnd.nextInt(25)+3);
+                Date end = c.getTime();
+                controlDisciplineRepository.save(new ControlDiscipline(begin,end,isAutoset,isStudentChange,isStudentOffer,d));
+            }
+        }
+        controlDisciplineRepository.flush();
+    }
+
+//Генерация кол-ва тем которые преподаватель должен подать к каждой привязанной к нему курсовой
+    public  void createTeacherInfoCoursework() {
+        SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
+        Session session = sessionFactory.openSession();
+        try {
+            List<Discipline> disciplineList = disciplineService.getAll();
+            for (Discipline d : disciplineList) {
+                d = session.get(d.getClass(), d.getId());
+                List<CourseWork> courseWorks = d.getCourseWork();
+                List<Group> groups = d.getGroups();
+                Integer maxStudentsInGroup = 0;
+                for (Group g : groups) {
+                    int countStudents = g.getPersons().size();
+                    if (maxStudentsInGroup < countStudents)
+                        maxStudentsInGroup = countStudents;
+                }
+                List<Person> teachers = d.getAttachedTeachers();
+                int curCount = 0;
+                for (CourseWork cw : courseWorks) {
+                    for (int i = 0; i < teachers.size(); i++) {
+                        int tmpCount = 0;
+                        if (i == teachers.size() - 1)
+                            tmpCount = maxStudentsInGroup - curCount;
+                        else
+                            tmpCount = rnd.nextInt(maxStudentsInGroup - curCount + 1);///warn check
+                        Person t = teachers.get(i);
+                        teacherInfoRepository.save(new TeacherInfo(tmpCount, t, cw));
+                        curCount += tmpCount;
+                    }
+                }
+
+            }
+            teacherInfoRepository.flush();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            session.close();
+        }
+
     }
     public void createDisciplines(){
         String[] disc = new String[]{"Программирование","Архитектура вычислительных систем","Дискретная математика","Теория алгоритмов и математическая логика","Операционные системы","Программное обеспечение вычислительных систем","Алгоритмы и структуры данных","Математическая статистика","Методы вычислений","Компьютерные сети","Объектно-ориентированное программирование","Анализ данных","Базы данных и информационные системы","Теория игр","Современные средства проектирования программного обеспечения","Методы оптимизации","Защита информации","Теория программирования","Системы и методы принятия решений","Теория графов","Теория управления","Вычислительная геометрия и компьютерная графика"};

@@ -1,6 +1,7 @@
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\CustomRequestCache.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\ThemeRepository.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\MainView.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\PersonService.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\RoleService.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\AbstractEntity.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\DisciplinesView.java
@@ -8,6 +9,8 @@ C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\User.jav
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\DataGeneration.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\CourseWork.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\UserService.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\TeacherInfoRepository.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\UtilService.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\components\AppNavigation.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\LoginView.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\SecurityUtils.java

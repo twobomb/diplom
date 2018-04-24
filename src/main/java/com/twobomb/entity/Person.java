@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,13 +43,38 @@ public class Person extends AbstractEntity{
     }
 
     @OneToMany(mappedBy = "add_person",fetch = FetchType.LAZY)
-    List<Theme> add_themes;
+    private List<Theme> add_themes;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "teacher_bind_discipline",
             joinColumns = @JoinColumn(name = "id_person_teacher"),
             inverseJoinColumns = @JoinColumn(name = "id_discipline_load"))
-    List<Discipline> disciplinesTeacher;
+    private List<Discipline> disciplinesTeacher;
+
+
+    @OneToMany(mappedBy = "person",fetch = FetchType.LAZY)
+    private List<TeacherInfo> teacherInfos;
+
+    public boolean isTeacher(){
+        return getUser().getRole().getRole().equals(Role.TEACHER);
+    }
+    public boolean isAdmin(){
+        return getUser().getRole().getRole().equals(Role.ADMIN);
+    }
+    public boolean isStudent(){
+        return getUser().getRole().getRole().equals(Role.ADMIN);
+    }
+    public void addTeacherInfo(TeacherInfo teacherInfo){
+        try{
+            if(!isTeacher())
+                throw new Exception("This person not have role teacher");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
+        this.teacherInfos.add(teacherInfo);
+    }
 
     public void addDisciplineTeacher(Discipline disciplinesTeacher) {
         this.disciplinesTeacher.add(disciplinesTeacher);
@@ -59,7 +85,7 @@ public class Person extends AbstractEntity{
     @JoinTable(name = "theme_bind_coursework",
             joinColumns = @JoinColumn(name = "id_person_student"),
             inverseJoinColumns = @JoinColumn(name = "id_theme"))
-    List<Theme> affixThemesStudent;
+    private List<Theme> affixThemesStudent;
 
 
     public List<Discipline> getDisciplinesTeacher() {

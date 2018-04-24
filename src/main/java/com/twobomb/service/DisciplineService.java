@@ -18,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("Duplicates")
 @Service("DisciplineService")
 @Repository
 @Transactional
@@ -33,6 +34,7 @@ public class DisciplineService {
 
     @Autowired
     GroupRepository groupRepository;
+
     public void attachGroup(Group group,Discipline discipline){
         SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
         Session session = sessionFactory.getCurrentSession();
@@ -41,7 +43,10 @@ public class DisciplineService {
         }
         catch (HibernateException e){
             e.printStackTrace();
-            session.getTransaction();
+            System.out.println("Уже существует транзакция");
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
 
         group = session.get(group.getClass(),group.getId());
@@ -57,7 +62,10 @@ public class DisciplineService {
         }
         catch (HibernateException e){
             e.printStackTrace();
-            session.getTransaction();
+            System.out.println("Уже существует транзакция");
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
         if(!person.getUser().getRole().getRole().equals(Role.TEACHER)){
             try {
@@ -72,7 +80,6 @@ public class DisciplineService {
 //        discipline = session.get(Discipline.class,discipline.getId());
         person.addDisciplineTeacher(discipline);
         personRepository.save(person);
-
     }
     public List<Discipline> getAll(){
         return discinplineRepository.findAll();

@@ -1,10 +1,6 @@
 package com.twobomb.entity;
 
-import org.hibernate.Hibernate;
-
 import javax.persistence.*;
-import javax.transaction.Transactional;
-import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -16,13 +12,17 @@ public class Discipline extends AbstractEntity{
     String name;
 
     @OneToOne(mappedBy = "discipline",fetch = FetchType.EAGER)
-    Control_Discipline control_discipline;
+    ControlDiscipline control_discipline;
 
     @OneToMany(mappedBy = "discipline",fetch = FetchType.EAGER)
     List<CourseWork> courseWork;
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    public List<Person> getAttachedTeachers() {
+        return attachedTeachers;
+    }
+
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     @JoinTable(name = "teacher_bind_discipline",
             joinColumns = @JoinColumn(name = "id_discipline_load"),
             inverseJoinColumns = @JoinColumn(name = "id_person_teacher"))
@@ -47,7 +47,7 @@ public class Discipline extends AbstractEntity{
     public Discipline() {
     }
 
-    public Control_Discipline getControl_discipline() {
+    public ControlDiscipline getControl_discipline() {
         return control_discipline;
     }
 

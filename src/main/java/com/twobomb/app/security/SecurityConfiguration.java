@@ -9,6 +9,7 @@ import com.twobomb.repository.UserRepository;
 import com.twobomb.service.DisciplineService;
 import com.twobomb.service.RoleService;
 import com.twobomb.service.UserService;
+import org.atmosphere.config.service.Post;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -24,6 +25,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
@@ -46,6 +48,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PostLoad;
 import javax.sql.DataSource;
 import javax.xml.crypto.Data;
 import java.util.List;
@@ -76,7 +79,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Qualifier("UserService")
     UserService userService;
 
+//    @Autowired
+//    LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean;
 
+
+//
+//
+//    @Bean
+//    public HibernateTransactionManager transactionManager() {
+//        SessionFactory sessionFactory = localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
+//        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+//        transactionManager.setSessionFactory(sessionFactory);
+//        return transactionManager;
+//    }
     /**
      HIBERNATE CONFIGURATION
      */
@@ -243,4 +258,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     );
 
     }
+
 }
