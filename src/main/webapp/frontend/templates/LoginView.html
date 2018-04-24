@@ -1,0 +1,123 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-password-field.html">
+<link rel="import" href="../bower_components/vaadin-icons/vaadin-icons.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+
+<dom-module id="login-view">
+    <template>
+        <style>
+            #login,#password{
+                max-width: 300px;
+            }
+            img{
+                border-radius: 100%;
+                -webkit-box-shadow: 0px 0px 21px 0px rgba(0,0,0,0.75);
+                -moz-box-shadow: 0px 0px 21px 0px rgba(0,0,0,0.75);
+                box-shadow: 0px 0px 21px 0px rgba(0,0,0,0.75);
+                transition:2s;
+            }
+            img:hover{
+                -webkit-box-shadow: 0px 0px 71px 0px rgba(0,0,0,0.75);
+                -moz-box-shadow: 0px 0px 71px 0px rgba(0,0,0,0.75);
+                box-shadow: 0px 0px 71px 0px rgba(0,0,0,0.75);
+                transition:2s;
+            }
+            iron-form,form{
+                display: block;
+                display: flex;
+                flex-direction: column;
+            }
+            .errorMsg{
+                --paper-toast-background-color:var(--lumo-error-color-10pct);
+                --paper-toast-color:var(--lumo-error-text-color);
+                --iron-icon-fill-color: #F00;
+            }
+            #container{
+                background: url(../images/bg.jpg) no-repeat;
+                background-size: cover;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+        </style>
+        <div id="container">
+            <img src="frontend/images/lnu.png" alt="Логотип">
+
+            <iron-form class="login" id="form" allow-redirect>
+                <form method="post" action="login">
+                    <vaadin-text-field id="login" name="username" value="student" placeholder="Введите логин" label="Логин" autofocus required>
+                        <iron-icon icon="lumo:user" slot="prefix"></iron-icon>
+                    </vaadin-text-field>
+                    <vaadin-password-field id="password" name="password" value="123456" placeholder="Введите пароль" label="Пароль" required>
+                        <iron-icon icon="vaadin:vaadin:password" slot="prefix"></iron-icon>
+                    </vaadin-password-field>
+                    <vaadin-button id="enter"  theme="success primary">
+                        <iron-icon icon="vaadin:vaadin:enter" slot="suffix"></iron-icon>
+                        Вход
+                    </vaadin-button>
+
+                    <template is="dom-if" if="{{error}}">
+                        <paper-toast class="errorMsg"  opened duration="5000">
+                            <iron-icon icon="vaadin:vaadin:warning"  errorLogPass></iron-icon>
+                            <span>Неверный логин или пароль</span>
+                        </paper-toast>
+                    </template>
+
+
+                </form>
+            </iron-form>
+        </div>
+    </template>
+    <script>
+        function showError(parent,txt) {
+            var toast = document.createElement("paper-toast");
+            toast.setAttribute("opened",true);
+            toast.setAttribute("duration",5000);
+            toast.setAttribute("class","errorMsg");
+            toast.innerHTML = " <iron-icon icon=\"vaadin:vaadin:warning\"  ></iron-icon><span>"+txt+"</span>";
+            parent.appendChild(toast);
+        }
+        class LoginView extends Polymer.Element{
+            static get is(){ return "login-view"; }
+
+            static get observers() {
+                return [ '_errorEnterChanged(errorEnter.*)' ];
+            }
+
+            _errorEnterChanged(v) {
+
+            }
+
+            ready() {
+                super.ready();
+                var _this = this;
+                this.$.enter.addEventListener("click",function () {
+                    if (!_this.$.login.invalid && !_this.$.password.invalid)
+                        _this.$.form.submit();
+                    else{
+                        showError(_this.$.form,"Введите данные");
+                    }
+
+                },false);
+
+            }
+
+            static get properties() {
+                return {
+                    error: {
+                        type: Boolean,
+                        value: false
+                    }
+                };
+            }
+
+        }
+        window.customElements.define(LoginView.is, LoginView);
+    </script>
+</dom-module>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="twobombdiplom:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="twobomb.diplom-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="twobombdiplom:war exploded" />
+    </root>
+  </artifact>
+</component>

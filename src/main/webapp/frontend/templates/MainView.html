@@ -1,0 +1,17 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../components/app-navigation.html">
+
+<dom-module id="main-view">
+    <template>
+        <app-navigation id="appNavigation"></app-navigation>
+        <slot></slot>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: "main-view"
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,119 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-list-box/vaadin-list-box.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<dom-module id="disciplines-view">
+    <template>
+        <style>
+
+            vaadin-list-box>vaadin-item>div{
+                display: flex;
+                flex-direction: column;
+            }
+            vaadin-list-box>vaadin-item>.block_info .theme_checked{
+                color:var(--lumo-success-text-color);
+            }
+            vaadin-list-box>vaadin-item>.block_info .theme_not_checked{
+                color:var(--lumo-error-text-color);
+            }
+            vaadin-list-box>vaadin-item>.block_info iron-icon{
+                margin-right: 10px;
+                height:20px;
+            }
+            vaadin-list-box>vaadin-item>.block_info{
+             margin: auto;
+            }
+            vaadin-list-box>vaadin-item>.block_info>div{
+                flex-direction: row;
+            }
+            vaadin-list-box>vaadin-item>.index{
+                font-size:30px;
+                margin: 0 20px;
+                margin-left: auto;
+            }
+            vaadin-list-box>vaadin-item>.name{
+                font-size:20px;
+                margin: 0 20px;
+            }
+            vaadin-list-box>vaadin-item:active{
+                background: var(--lumo-shade-40pct);
+            }
+            vaadin-list-box>vaadin-item{
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                transition: .5s;
+                padding: 20px;
+                display: flex;
+                -webkit-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                -moz-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                flex-direction: row;
+                align-items: center;
+                font-family: var(--lumo-font-family);
+                position: relative;
+            }
+            @media screen and (max-width: 480px) {
+                vaadin-list-box>vaadin-item>.block_info{
+                    display: none;
+                }
+            }
+        </style>
+
+        <vaadin-list-box id="listDisciplines">
+
+            <template is="dom-repeat" items="{{disc_info}}">
+                <vaadin-item on-click="handleClick">
+                    <div class="index">{{item.index}}</div>
+                    <div class="name">{{item.name}}</div>
+                    <div class="block_info">
+                        <template is="dom-if" if="{{item.isChecked}}">
+                            <div class="status theme_checked">
+                                <iron-icon icon="vaadin:vaadin:check" ></iron-icon>Темы выбраны
+                            </div>
+                        </template>
+                        <template  class="theme_not_checked" is="dom-if" if="{{item.isNotChecked}}">
+                            <div class="status theme_not_checked">
+                                <iron-icon icon="vaadin:vaadin:form" ></iron-icon>Необходимо выбрать темы
+                            </div>
+                        </template>
+                        <div class="count"><iron-icon icon="vaadin:vaadin:file-text-o"></iron-icon>Курсовых {{item.count}}</div>
+                    </div>
+                </vaadin-item>
+            </template>
+        </vaadin-list-box>
+    </template>
+
+    <script>
+        class DisciplinesView extends Polymer.Element{
+            static get is(){ return "disciplines-view"; }
+            ready(){
+                super.ready();
+                this.disc_info = [];
+                for(var i = 0; i < this.disciplineNames.length;i++)
+                    this.disc_info.push({
+                        index:(i+1),
+                        name:this.disciplineNames[i],
+                        count:this.courseworkCount[i],
+                        isChecked:this.themeChecked[i],
+                        isNotChecked:this.themeNotChecked[i]
+                    });
+
+            }
+            static get properties() {
+                return {
+                    is_theme_not_checked: {
+                        type: Boolean,
+                        value: false
+                    },
+                    is_theme_checked:{
+                        type: Boolean,
+                        value: false
+                    }
+                };
+            }
+        }
+        window.customElements.define(DisciplinesView.is, DisciplinesView);
+    </script>
+</dom-module>
