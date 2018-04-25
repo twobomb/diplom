@@ -24,6 +24,10 @@
       }
 
       vaadin-tab {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
         font-size: var(--lumo-font-size-xs);
         padding-left: .75em;
         padding-right: .75em;
@@ -84,19 +88,76 @@
          height:100%;
       }
 
-      @media screen and (max-width: 640px){
+      @media screen and (max-width: 940px){
         #profile {
           display: none;
         }
       }
+
+
+      .onoffswitch {
+        left: 20px;
+        position: relative; width: 109px;
+        -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+      }
+      .onoffswitch-checkbox {
+        display: none;
+      }
+      .onoffswitch-label {
+        display: block; overflow: hidden; cursor: pointer;
+        border: 2px solid #999999; border-radius: 50px;
+      }
+      .onoffswitch-inner {
+        display: block; width: 200%; margin-left: -100%;
+        transition: margin 0.3s ease-in 0s;
+      }
+      .onoffswitch-inner:before, .onoffswitch-inner:after {
+        display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+        font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+        box-sizing: border-box;
+      }
+      .onoffswitch-inner:before {
+        content: "Темная";
+        padding-left: 11px;
+        background-color: #233348; color: #FFFFFF;
+      }
+      .onoffswitch-inner:after {
+        content: "Светлая";
+        padding-right: 11px;
+        background-color: #FFFFFF; color: #233348;
+        text-align: right;
+      }
+      .onoffswitch-switch {
+        display: block; width: 18px; margin: 6px;
+        background: #FFFFFF;
+        position: absolute; top: 0; bottom: 0;
+        right: 75px;
+        border: 2px solid #999999; border-radius: 50px;
+        transition: all 0.3s ease-in 0s;
+      }
+      .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+        margin-left: 0;
+      }
+      .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+        right: 0px;
+      }
     </style>
 
-    <div class="toolbar">
+
+    <div class="toolbar" >
       <div class="branding">
         Модуль распределения курсовых работ
       </div>
-      <vaadin-tabs id="tabs">
+      <vaadin-tabs id="tabs" >
       </vaadin-tabs>
+      <div class="onoffswitch" >
+        <input type="checkbox" on-click="changeTheme" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
+
+        <label class="onoffswitch-label" for="myonoffswitch">
+          <span class="onoffswitch-inner"></span>
+          <span class="onoffswitch-switch"></span>
+        </label>
+      </div>
       <div id="profile">
         <iron-icon class="usericon" icon="vaadin:vaadin:user" slot="prefix"></iron-icon>
         <span class="username">
@@ -110,11 +171,45 @@
   </template>
 
   <script>
+
+      function themeControl(change) {
+          var theme = localStorage.getItem("theme");
+
+          if(theme == null)
+              theme = "light";
+          if(change)
+              theme = theme == "dark" ? "light" : "dark";
+
+          localStorage.setItem("theme",theme);
+
+          var root = window.document.querySelector("main-view").shadowRoot.querySelector("#root");
+          var btn = window.document.querySelector("main-view").shadowRoot.querySelector("#appNavigation").shadowRoot.querySelector("#myonoffswitch");
+
+          switch (theme){
+              case "dark":
+                  root.setAttribute("theme","dark");
+                  btn.setAttribute("checked",true);
+                  break;
+              default:
+                  if(root.getAttribute("theme") != null)
+                      root.removeAttribute("theme");
+                  if(root.getAttribute("checked") != null)
+                      btn.removeAttribute("checked");
+          }
+
+      }
+
     class AppNavigation extends Polymer.Element {
       static get is() {
         return 'app-navigation';
       }
-
+        changeTheme(){
+            themeControl(true);
+        }
+        ready(){
+            super.ready();
+            themeControl();
+        }
         static get properties() {
             return {
                 username: {
@@ -130,5 +225,45 @@
     }
 
     window.customElements.define(AppNavigation.is, AppNavigation);
+
+    function setCookie(name, value, options) {
+        options = options || {};
+
+        var expires = options.expires;
+
+        if (typeof expires == "number" && expires) {
+            var d = new Date();
+            d.setTime(d.getTime() + expires * 1000);
+            expires = options.expires = d;
+        }
+        if (expires && expires.toUTCString) {
+            options.expires = expires.toUTCString();
+        }
+
+        value = encodeURIComponent(value);
+
+        var updatedCookie = name + "=" + value;
+
+        for (var propName in options) {
+            updatedCookie += "; " + propName;
+            var propValue = options[propName];
+            if (propValue !== true) {
+                updatedCookie += "=" + propValue;
+            }
+        }
+
+        document.cookie = updatedCookie;
+    }
+    function getCookie(name) {
+        var matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+    function deleteCookie(name) {
+        setCookie(name, "", {
+            expires: -1
+        })
+    }
   </script>
 </dom-module>

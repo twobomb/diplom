@@ -1,5 +1,6 @@
 com\twobomb\app\DataGeneration.class
 com\twobomb\entity\AbstractEntity.class
+com\twobomb\ui\pages\CourseworkView$Model.class
 com\twobomb\app\security\SecurityUtils.class
 com\twobomb\repository\RoleRepository.class
 com\twobomb\service\DisciplineService.class
@@ -23,6 +24,7 @@ com\twobomb\entity\ControlDiscipline.class
 com\twobomb\repository\ThemeRepository.class
 com\twobomb\repository\UserRepository.class
 com\twobomb\entity\Person.class
+com\twobomb\ui\pages\CourseworkView.class
 com\twobomb\ui\pages\DisciplinesView.class
 com\twobomb\app\security\SecurityConfiguration.class
 com\twobomb\repository\ControlDisciplineRepository.class

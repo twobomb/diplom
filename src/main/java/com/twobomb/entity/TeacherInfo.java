@@ -11,6 +11,18 @@ public class TeacherInfo extends AbstractEntity{
     @Column(name="count_theme")
     Integer count_theme;
 
+    public Integer getCount_theme() {
+        return count_theme;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public CourseWork getCourseWork() {
+        return courseWork;
+    }
+
     @NotNull
     @JoinColumn(name = "id_person_teacher")
     @ManyToOne(cascade = {CascadeType.REFRESH,CascadeType.MERGE})

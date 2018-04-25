@@ -178,10 +178,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean
+    @Bean(name = "CurrentUser")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public User currentUser() {
-        User user = userService.getByLogin(SecurityUtils.getUsername());
+        String username = SecurityUtils.getUsername();
+        if(username == null){
+            try {
+                throw new Exception("No authorize user!");
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
+        }
+        User user = userService.getByLogin(username);
         return user;
     }
 

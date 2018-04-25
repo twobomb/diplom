@@ -22,4 +22,5 @@ public class AbstractEntity implements Serializable {
     }
 
 
+
 }

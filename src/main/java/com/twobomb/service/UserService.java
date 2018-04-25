@@ -35,7 +35,7 @@ public class UserService{
 
     public List<User> getUserByRole(String role){
         List<User> users = userRepository.findAll();
-        users.removeIf(x -> !x.getRole().getRole().equals(Role.TEACHER));
+        users.removeIf(x -> !x.getRole().getRole().equals(role));
         return users;
     }
 

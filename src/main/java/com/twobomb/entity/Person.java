@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 @Entity
@@ -64,6 +66,11 @@ public class Person extends AbstractEntity{
     public boolean isStudent(){
         return getUser().getRole().getRole().equals(Role.ADMIN);
     }
+
+    public List<TeacherInfo> getTeacherInfos() {
+        return teacherInfos;
+    }
+
     public void addTeacherInfo(TeacherInfo teacherInfo){
         try{
             if(!isTeacher())
@@ -81,11 +88,13 @@ public class Person extends AbstractEntity{
     }
 
     //темы прикрепленные к студенту
+
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinTable(name = "theme_bind_coursework",
+    @JoinTable(name = "student_bind_theme_in_coursework",
             joinColumns = @JoinColumn(name = "id_person_student"),
             inverseJoinColumns = @JoinColumn(name = "id_theme"))
-    private List<Theme> affixThemesStudent;
+    @MapKeyJoinColumn(name = "id_coursework")
+    private Map<CourseWork,Theme> affixThemesStudent;
 
 
     public List<Discipline> getDisciplinesTeacher() {
@@ -94,7 +103,7 @@ public class Person extends AbstractEntity{
 
 
     public List<Theme> getAffixThemesStudent() {
-        return affixThemesStudent;
+        return new ArrayList<>(affixThemesStudent.values());
     }
     public Person() {
     }

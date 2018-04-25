@@ -2,7 +2,9 @@ package com.twobomb.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "courseworks")
@@ -18,6 +20,18 @@ public class CourseWork extends AbstractEntity {
     private Discipline discipline;
 
 
+//    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+//    @JoinTable(name = "student_bind_theme_in_coursework",
+//            joinColumns = @JoinColumn(name = "id_coursework"),
+//            inverseJoinColumns = @JoinColumn(name = "id_theme"))
+
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinTable(name = "student_bind_theme_in_coursework",
+            joinColumns = @JoinColumn(name = "id_coursework"),
+            inverseJoinColumns = @JoinColumn(name = "id_person_student"))
+    @MapKeyJoinColumn(name = "id_theme")
+    private Map<Theme,Person> themesWithAffixedStudent;
+
     public Discipline getDiscipline() {
         return discipline;
     }
@@ -26,11 +40,22 @@ public class CourseWork extends AbstractEntity {
 
     }
 
+    public String getName() {
+        return name;
+    }
+
+//    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
+//    @JoinTable(name = "theme_bind_coursework",
+//            joinColumns = @JoinColumn(name = "id_coursework"),
+//            inverseJoinColumns = @JoinColumn(name = "id_theme"))
+//    List<Theme> themes;
+
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
     @JoinTable(name = "theme_bind_coursework",
             joinColumns = @JoinColumn(name = "id_coursework"),
             inverseJoinColumns = @JoinColumn(name = "id_theme"))
     List<Theme> themes;
+
 
     @OneToMany(mappedBy = "courseWork",fetch = FetchType.LAZY)
     List<TeacherInfo> teacherInfos;

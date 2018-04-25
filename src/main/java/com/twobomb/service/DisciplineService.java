@@ -10,13 +10,15 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SuppressWarnings("Duplicates")
 @Service("DisciplineService")
@@ -35,6 +37,115 @@ public class DisciplineService {
     @Autowired
     GroupRepository groupRepository;
 
+    @Autowired
+    ApplicationContext ctx;
+
+    public HashMap<String,Object> getData_CV(Long dis_id){
+
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+        if(dis_id >= 0 && dis_id < disciplineList.size())
+            disciplineList = new ArrayList<>(Collections.singleton(disciplineList.get(Math.toIntExact(dis_id))));
+
+        List<CourseWork> courseWorks = new ArrayList<>();
+
+        for(Discipline discipline:disciplineList)
+            courseWorks.addAll(discipline.getCourseWork());
+
+
+        List<String> courseworkName = new ArrayList<>();
+        List<String> disciplineName = new ArrayList<>();
+        List<String> prepodList = new ArrayList<>();
+        List<String> dateBegin = new ArrayList<>();
+        List<String> dateEnd = new ArrayList<>();
+        List<Boolean> isThemeChecked = new ArrayList<>();
+        for(CourseWork cw:courseWorks){
+            courseworkName.add(cw.getName());
+            disciplineName.add(cw.getDiscipline().getName());
+            List<Person> teacherAttach = cw.getDiscipline().getAttachedTeachers();
+            String teacherNames = "";
+            for(Person teacher:teacherAttach)
+                teacherNames+=teacher.getLastname()+" "+teacher.getFirstname().charAt(0)+"., ";
+            teacherNames = teacherNames.replaceFirst(", $","");
+            prepodList.add(teacherNames);
+            ControlDiscipline control = cw.getDiscipline().getControl_discipline();
+            String begin = "неизвестно";
+            if(control.getDateBegin() != null)
+                begin = new SimpleDateFormat("dd.MM.yyyy").format(control.getDateBegin());
+            dateBegin.add(begin);
+            String end = "неизвестно";
+            if(control.getDateEnd() != null)
+                end = new SimpleDateFormat("dd.MM.yyyy").format(control.getDateEnd());
+            dateEnd.add(end);
+            boolean isCheked = false;
+            List<Theme> themeList = currentUser.getPerson().getAffixThemesStudent();
+            for(Theme theme:themeList)
+                if(theme.getCourseWorks().contains(cw)){
+                    isCheked = true;
+                    break;
+                }
+            isThemeChecked.add(isCheked);
+        }
+
+        HashMap<String,Object> result = new HashMap<>();
+        result.put("courseworkName",courseworkName);
+        result.put("disciplineName",disciplineName);
+        result.put("prepodList",prepodList);
+        result.put("dateBegin",dateBegin);
+        result.put("dateEnd",dateEnd);
+        result.put("isThemeChecked",isThemeChecked);
+
+        return result;
+    }
+    public HashMap<String,Object> getData_DV(){
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        Person person = currentUser.getPerson();
+//            person = session.get(person.getClass(), person.getId());
+        HashMap<String,Object> result = new HashMap<>();
+        List<String> disciplineName = new ArrayList<>();
+        List<Integer> courseworkCount = new ArrayList<>();
+        List<Boolean> isChecked = new ArrayList<>();
+        List<Boolean> isNotChecked = new ArrayList<>();
+
+        List<Discipline> list = getBindDisciplineWidthUser(currentUser);
+
+        for (Discipline l : list) {
+//                l = session.get(Discipline.class, l.getId());
+            courseworkCount.add(l.getCourseWork().size());
+            disciplineName.add(l.getName());
+
+            //Курсовые работы дисциплины
+            List<CourseWork> courseWorks = l.getCourseWork();
+            //Привязанные темы студента
+            List<Theme> themeAffix = person.getAffixThemesStudent();
+
+            //Проверка во всех ли курсовых данного предмета есть привязанная тема данного студента
+            Boolean isCheckedTmp = true;
+            for (CourseWork cw : courseWorks) {
+                List<Theme> cwThemes = cw.getThemes();
+                boolean flag = false;
+                for (Theme studTheme : themeAffix) {
+                    if (cwThemes.contains(studTheme)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag) {
+                    isCheckedTmp = false;
+                    break;
+                }
+            }
+            isChecked.add(isCheckedTmp);
+            isNotChecked.add(!isCheckedTmp);
+
+        }
+        result.put("courseworkCount",courseworkCount);
+        result.put("disciplineName",disciplineName);
+        result.put("isChecked",isChecked);
+        result.put("isNotChecked",isNotChecked);
+
+        return result;
+    }
     public void attachGroup(Group group,Discipline discipline){
         SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
         Session session = sessionFactory.getCurrentSession();

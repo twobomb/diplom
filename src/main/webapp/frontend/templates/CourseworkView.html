@@ -1,0 +1,145 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-list-box/vaadin-list-box.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<dom-module id="coursework-view">
+    <template>
+        <style>
+            vaadin-item{
+                display: flex;
+                flex-direction: row;
+                padding: 20px;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                transition: .5s;
+                -webkit-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                -moz-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);;
+                align-items: center;
+                font-family: var(--lumo-font-family);
+                position: relative;
+            }
+            vaadin-item>.col{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            vaadin-item>.col>.name{
+               font-size: 1.2em;
+                padding-left: 5px;
+                border-left: 2px solid var(--lumo-primary-text-color);;
+                color:  var(--lumo-primary-text-color);;
+            }
+            vaadin-item>.col>.prepods{
+                padding-left: 5px;
+                border-left: 2px solid var(--lumo-success-text-color);
+                color:  var(--lumo-success-text-color);
+                font-size: .9em;
+                font-style: italic;
+            }
+            vaadin-item>.col>.dis_name{
+                font-size: 1em;
+                padding-left: 5px;
+                border-left: 2px solid var(--lumo-error-text-color);
+                color:  var(--lumo-error-text-color);
+            }
+            vaadin-item>.col.dop_info iron-icon{
+                height:18px;
+            }
+            vaadin-item>.col.dop_info>.enddate{
+                color:  var(--lumo-error-text-color);
+                border-bottom: 1px solid var(--lumo-error-text-color);
+
+            }
+            vaadin-item>.col.dop_info>.begindate{
+                color:  var(--lumo-success-text-color);
+                border-bottom: 1px solid var(--lumo-success-text-color);
+            }
+            vaadin-item>.col.dop_info .theme_checked{
+                background:  var(--lumo-success-color-50pct);
+                border-bottom: 3px solid var(--lumo-success-text-color);
+                margin-right: auto;
+                padding-right: 20px;
+
+            }
+            vaadin-item>.col.dop_info .theme_not_checked{
+                background:  var(--lumo-error-color-50pct);
+                border-bottom: 3px solid var(--lumo-error-text-color);
+
+            }
+            vaadin-item>.col.dop_info{
+                margin-left: auto;
+            }
+            vaadin-item>.col>.index{
+                font-size:30px;
+                margin: 0 20px;
+            }
+
+        </style>
+
+        <vaadin-list-box id="listCourseworks">
+
+            <template is="dom-repeat" items="{{coursework_info}}">
+                <vaadin-item on-click="handleClick">
+                    <div class="col">
+                        <span class="index">{{item.index}}</span>
+                    </div>
+                    <div class="col">
+                        <div class="dis_name">{{item.disciplineName}}</div>
+                        <div class="name">{{item.courseworkName}}</div>
+                        <div class="prepods">Преподаватели: {{item.prepodList}}</div>
+                    </div>
+                    <div class="col dop_info">
+                        <div class="begindate"> <iron-icon icon="vaadin:vaadin:calendar"></iron-icon> Начало подачи тем {{item.dateBegin}}</div>
+                        <div class="enddate"> <iron-icon icon="vaadin:vaadin:alarm"></iron-icon> Конец подачи тем {{item.dateEnd}}</div>
+
+                        <template is="dom-if" if="{{item.isThemeNotChecked}}">
+                            <div class="status theme_not_checked"><iron-icon icon="vaadin:vaadin:warning"></iron-icon> Необходимо выбрать тему</div>
+                        </template>
+                        <template is="dom-if" if="{{item.isThemeChecked}}">
+                            <div class="status theme_checked"><iron-icon icon="vaadin:vaadin:check-circle"></iron-icon> Тема выбрана</div>
+                        </template>
+                    </div>
+                </vaadin-item>
+            </template>
+        </vaadin-list-box>
+    </template>
+
+    <script>
+        class CourseworkView extends Polymer.Element {
+            static get is() {
+                return "coursework-view";
+            }
+            connectedCallback() {
+                super.connectedCallback();
+                this.coursework_info = [];
+                for(var i = 0; i < this.courseworkName.length;i++){
+                    this.coursework_info.push({
+                        index:i,
+                        courseworkName: this.courseworkName[i],
+                        disciplineName: this.disciplineName[i],
+                        prepodList: this.prepodList[i],
+                        dateBegin: this.dateBegin[i],
+                        dateEnd: this.dateEnd[i],
+                        isThemeChecked: this.isThemeChecked[i],
+                        isThemeNotChecked: !this.isThemeChecked[i]
+                    });
+                }
+            }
+
+            static get properties() {
+                return {
+                    isLoaded: {
+                        type: Boolean,
+                        observer(){
+
+                        }
+                    }
+                };
+            }
+        }
+        window.customElements.define(CourseworkView.is, CourseworkView);
+    </script>
+</dom-module>

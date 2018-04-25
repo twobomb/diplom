@@ -1,5 +1,6 @@
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\CustomRequestCache.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\ThemeRepository.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\ControlDiscipline.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\MainView.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\PersonService.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\RoleService.java
@@ -18,7 +19,7 @@ C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\Ha
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Person.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\components\PageInfo.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Theme.java
-C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Control_Discipline.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\ControlDisciplineRepository.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\UserRepository.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\Utils\AppConst.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\DisciplineService.java
@@ -29,6 +30,7 @@ C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\Se
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\UserDetailsServiceImpl.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Group.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\Application.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\CourseworkView.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\CourseworkRepository.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\ThemeService.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Discipline.java
