@@ -122,7 +122,7 @@
         </dependency>
         <!-- End of Vaadin -->
 
-        <!-- Iron and paper elements -->
+        <!-- Iron and paper, and other polymer elements -->
 
         <dependency>
             <groupId>org.vaadin.icons</groupId>
@@ -138,6 +138,11 @@
             <groupId>org.webjars.bowergithub.polymerelements</groupId>
             <artifactId>paper-toast</artifactId>
             <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.bowergithub.polymerelements</groupId>
+            <artifactId>iron-collapse</artifactId>
+            <version>2.2.0</version>
         </dependency>
         <!-- Spring -->
         <dependency>

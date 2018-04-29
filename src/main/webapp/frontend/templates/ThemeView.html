@@ -1,0 +1,357 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-list-box/vaadin-list-box.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
+<dom-module id="theme-view">
+    <template >
+        <style>
+            #aboutBlock div{
+                transition: 2s;
+            }
+            #aboutBlock{
+                transition: 2s;
+                display: flex;
+                flex-direction: column;
+                width:60%;
+                margin:auto;
+                padding: 20px;
+                border-radius: 20px;
+                border:1px solid var(--lumo-shade-80pct);
+                -webkit-box-shadow: 0px 4px 50px -2px var(--lumo-shade-40pct);
+                -moz-box-shadow: 0px 4px 50px -2px var(--lumo-shade-40pct);
+                box-shadow: 0px 0px 50px 0px var(--lumo-shade-40pct);
+            }
+            #aboutBlock .nameColorInfo{
+                color:var(--lumo-tertiary-text-color);
+                font-weight: 600;
+                margin-right: 5px;
+            }
+            @media (max-width: 760px)  {
+                #aboutBlock{
+                    width:100%;
+                    padding: 5px;
+                    box-sizing: border-box;
+                }
+            }
+            h2{
+                color:var(--lumo-primary-color);
+                text-align: center;
+                justify-content: center;
+            }
+            #aboutBlock .row.groupname{
+                font-size:1.2em;
+                text-decoration:underline;
+            }
+            #aboutBlock .row.endThemeInfo{
+                font-size:1.1em;
+                color: var(--lumo-error-color);
+                border-left:3px solid var(--lumo-error-color);
+                border-bottom:3px solid var(--lumo-error-color);
+                margin-right: auto;
+            }
+            #aboutBlock .row.beginThemeInfo{
+                font-size:1.1em;
+                color: var(--lumo-success-color);
+                border-left:3px solid var(--lumo-success-color);
+                border-bottom:3px solid var(--lumo-success-color);
+                margin-right: auto;
+            }
+             #dopinfo div{
+                 color:var(--lumo-secondary-text-color);
+                 font-size: 1.1em;
+                 font-weight: 500;
+                 margin-top: 15px;
+                 padding-bottom: 5px;
+                 border-bottom: 1px solid var(--lumo-shade-90pct);
+            }
+             .statusOn{
+                 border-radius: 15px;
+                 padding: 2px 5px;
+                 font-size:.9em;
+                 background: var(--lumo-success-color);
+                 color:var(--lumo-tint-90pct);
+                 float:right;
+             }
+             .statusOff{
+                 border-radius: 15px;
+                 padding: 2px 5px;
+                 font-size:.9em;
+                 background: var(--lumo-error-color);
+                 color:var(--lumo-tint-90pct);
+                 float:right;
+             }
+            #aboutBlock .row{
+                display: flex;
+                flex-direction: row;
+                margin-top: 5px;
+                color: var(--lumo-secondary-text-color);
+            }
+            .warn{
+                border-bottom:3px solid var(--lumo-error-color);
+                background: var(--lumo-error-color-10pct);
+                margin-right: auto;
+                font-size: .9em;
+            }
+
+
+        </style>
+                 <h2 class="row">{{additionalCourseWorkInfo.courseworkName}}</h2>
+            <div id="aboutBlock">
+                <span class="row groupname">Группа: {{additionalCourseWorkInfo.groupName}}</span>
+                <span class="row"><span class="nameColorInfo">Дисциплина: </span> {{additionalCourseWorkInfo.disciplineName}}</span>
+                <span class="row"><span class="nameColorInfo">Преподаватели: </span> {{additionalCourseWorkInfo.teachers}}</span>
+                <div class="row beginThemeInfo">Начало подачи тем {{additionalCourseWorkInfo.beginDate}}
+                </div>
+                <div class="row endThemeInfo">Конец подачи тем
+                    {{additionalCourseWorkInfo.endDate}}
+                </div>
+                <template is="dom-if" if="{{additionalCourseWorkInfo.isNeedWarnCount}}">
+                    <span class="row warn">Преподаватели должны добавить еще минимум {{additionalCourseWorkInfo.teachersMustAddCount}} </span>
+                </template>
+                <vaadin-button on-click="showDopInfo" >Дополонительные установки</vaadin-button>
+                <iron-collapse id="dopinfo" >
+                    <div>Автоназначение тем по дате окончания
+                        <template  is="dom-if" if="{{!additionalCourseWorkInfo.isAutoset}}">
+                            <span class="statusOff">Отключено</span>
+                        </template>
+                        <template is="dom-if" if="{{additionalCourseWorkInfo.isAutoset}}">
+                            <span class="statusOn">Включено</span>
+                        </template>
+                    </div>
+                    <div>Студент может открепляться от выбранной темы
+                        <template  is="dom-if" if="{{!additionalCourseWorkInfo.isStudentChange}}">
+                            <span class="statusOff">Отключено</span>
+                        </template>
+                        <template is="dom-if" if="{{additionalCourseWorkInfo.isStudentChange}}">
+                            <span class="statusOn">Включено</span>
+                        </template>
+                    </div>
+                    <div>Студент может предложить свою тему
+                        <template  is="dom-if" if="{{!additionalCourseWorkInfo.isStudentOffer}}">
+                            <span class="statusOff">Отключено</span>
+                        </template>
+                        <template is="dom-if" if="{{additionalCourseWorkInfo.isStudentOffer}}">
+                            <span class="statusOn">Включено</span>
+                        </template>
+                    </div>
+
+                </iron-collapse>
+
+            </div>
+
+
+<style>
+        vaadin-list-box{
+        margin-top: 20px;
+        }
+        vaadin-list-box>vaadin-item .row{
+        display: flex;
+        flex-direction: row;
+        }
+        vaadin-list-box>vaadin-item .col{
+        display: flex;
+        flex-direction: column;
+        }
+        vaadin-list-box>vaadin-item{
+        cursor:pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        transition: .5s;
+        padding: 20px;
+        display: flex;
+        -webkit-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+        -moz-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+        box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+        flex-direction: row;
+        align-items: center;
+        font-family: var(--lumo-font-family);
+        position: relative;
+        }
+        vaadin-list-box>vaadin-item .attachBlock{
+            float: right;
+            margin-left: auto;
+        }
+        vaadin-item .themeIndex{
+            font-size:30px;
+            margin: 0 20px;
+        }
+        vaadin-item .ti_block .themeEditor iron-icon{
+            height: 1.1em;
+        }
+        vaadin-item .attachBlock .attachTheme[disabled],vaadin-item .attachBlock .deatachTheme[disabled]{
+            background: var(--lumo-disabled-text-color);
+            opacity: .4;
+        }
+        vaadin-item .attachBlock .themeAttachedInfo iron-icon,vaadin-item .attachBlock .themeAttachedTeacher iron-icon{
+            height: 1em;
+            margin-right:10px;
+        }
+        vaadin-item .attachBlock .attachTheme{
+            background: var(--lumo-success-color);
+            color:var(--lumo-tint-90pct);
+        }
+        vaadin-item .attachBlock .deatachTheme{
+            background: var(--lumo-error-color);
+            color:var(--lumo-tint-90pct);
+        }
+        vaadin-item .attachBlock .themeAttachedInfo{
+            text-align: center;
+            margin-top: 10px;
+            background: var(--lumo-primary-color-50pct);
+            border-radius: 5px;
+            color:var(--lumo-tint-90pct);
+        }
+        vaadin-item .attachBlock .themeAttachedTeacher{
+            text-align: center;
+            margin-top: 10px;
+            border-bottom:2px solid var(--lumo-error-color-50pct);
+            background:2px solid var(--lumo-primary-color-10pct);
+            border-radius: 5px;
+            color:var(--lumo-body-text-color);
+        }
+        vaadin-item .ti_block{
+            margin-right: 10px;
+        }
+
+        vaadin-item .ti_block .themeEditor{
+            position: absolute;
+            top:0;
+            left: 20px;
+            font-size: .8em;
+            color:var(--lumo-disabled-text-color);
+        }
+        vaadin-item .descBtn{
+            width: 300px;
+        }
+        vaadin-item .themeDesciption{
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+        vaadin-item .themeName{
+            font-size: 1.3em;
+        }
+        @media (min-width:768px) {
+            vaadin-item .attachBlock{
+                min-width: 280px;
+            }
+        }
+        </style>
+        <vaadin-list-box id="listCourseworks">
+            <template is="dom-repeat" items="{{themeItemInfo}}">
+                <vaadin-item on-click="handleClick">
+                    <div class="themeIndex col">{{item.index}}</div>
+                    <div class="col ti_block">
+                        <template is="dom-if" if="{{!item.isEditedNull}}">
+                            <div class="themeEditor row"> <iron-icon icon="vaadin:vaadin:edit" ></iron-icon>{{item.edited}}</div>
+                        </template>
+                            <div class="themeName row">{{item.name}}</div>
+                        <vaadin-button class="row descBtn" on-click="showThemeDescription" data-themeid$='{{item.index}}'>Описание</vaadin-button>
+                        <iron-collapse class="row themeDesciption" id$="themeDescription{{item.index}}" >
+                                [[ _formatDescription(item.description)]]
+                        </iron-collapse>
+                    </div>
+                    <div class="attachBlock col">
+                        <template  is="dom-if" if="{{item.isCanAttach}}">
+                            <vaadin-button on-click="attachMe" {{item.isDisabledAttachBtn}} data-index$="{{item.index}}" class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                        </template>
+                        <template  is="dom-if" if="{{item.isCurrentUserAttach}}">
+                            <vaadin-button {{item.isDisabledDetachBtn}} class="deatachTheme"><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
+                        </template>
+                        <div class="themeAttachedInfo"><iron-icon icon="vaadin:vaadin:info-circle"></iron-icon>{{item.status}}</div>
+                        <div class="themeAttachedTeacher"><iron-icon icon="vaadin:vaadin:nurse"></iron-icon>Преподаватель {{item.teacherAdd}}</div>
+                    </div>
+                </vaadin-item>
+            </template>
+        </vaadin-list-box>
+
+
+        </template>
+    <script>
+        function trueRussianDecline(d1, d2,d3, c){
+            switch (c%100){
+                case 11: case 12: case 13: case 14:return d1;
+                default:
+                    switch (c%10){
+                        case 0:case 5:case 6:case 7:case 8:case 9:return d1;
+                        case 1: return d2;
+                        case 2:case 3:case 4: return d3;
+                    }
+            }
+            return "";
+        }
+
+        class ThemeView extends Polymer.Element {
+            static get is() {
+                return "theme-view";
+            }
+            attachMe(event){
+                var index = event.srcElement.getAttribute("data-index") -1;
+                this.notifyPath("indexAttachTheme",index);
+                event.indexAttachTheme = index;
+            }
+            _formatDescription(txt){
+                return txt;
+                //return txt.replace("\n",).replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;");
+            }
+            showDopInfo(e) {
+                this.$.dopinfo.toggle();
+                e.target.setAttribute('aria-expanded', this.$.dopinfo.opened);
+            }
+            showThemeDescription(e) {
+                var id = e.target.getAttribute("data-themeid");
+                var collapse = this.$.listCourseworks.querySelector("#themeDescription"+id);
+                collapse.toggle();
+                e.target.setAttribute('aria-expanded', collapse.opened);
+            }
+            connectedCallback() {
+                super.connectedCallback();
+            }
+
+            static get properties() {
+                return {
+                        additionalCourseWorkInfo:{
+                          observer(){
+                              this.set('additionalCourseWorkInfo.isNeedWarnCount', this.additionalCourseWorkInfo.teachersMustAddCount > 0);
+                              this.set('additionalCourseWorkInfo.teachersMustAddCount',this.additionalCourseWorkInfo.teachersMustAddCount+" "+ trueRussianDecline("тем","тему","темы",this.additionalCourseWorkInfo.teachersMustAddCount));
+                          }
+                        },
+                        themeItemInfo:{
+                          observer(){
+                              this.themeItemInfo.map(function (e) {
+                                  e.isDisabledAttachBtn = e.isDisabledAttachBtn?" disabled ":"";
+                                  e.isDisabledDetachBtn = e.isDisabledDetachBtn?" disabled ":"";
+                                  //e.edited = Math.random() < .3?"Отредактироал вася пупкин":null;//test
+                                  e.isEditedNull = e.edited == null || e.edited == "";
+                              });
+                          }
+                        },
+                        error:{
+                            observer(){
+                             alert(this.error);
+                            }
+                        },
+                        dateBeginIsBefore:{
+                            value:true
+                        },
+                        dateEndIsBefore:{
+                            value:true
+                        },
+                        isStudentOffer:{
+                            value:false
+                        },
+                        isStudentChange:{
+                                value:true
+                        },
+                        isAutoset:{
+                                value:false
+                        }
+                };
+            }
+        }
+        window.customElements.define(ThemeView .is, ThemeView );
+    </script>
+</dom-module>

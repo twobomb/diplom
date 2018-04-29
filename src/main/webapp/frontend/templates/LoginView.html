@@ -93,19 +93,20 @@
             _errorEnterChanged(v) {
 
             }
-
             ready() {
                 super.ready();
                 var _this = this;
-                this.$.enter.addEventListener("click",function () {
+                var submit = function () {
                     if (!_this.$.login.invalid && !_this.$.password.invalid)
                         _this.$.form.submit();
-                    else{
+                    else
                         showError(_this.$.form,"Введите данные");
-                    }
-
-                },false);
-
+                }
+                this.$.enter.addEventListener("click",submit,false);
+                document.addEventListener("keypress",function(e){
+                    if(e.keyCode == 13)
+                        submit();
+                },false)
             }
 
             static get properties() {

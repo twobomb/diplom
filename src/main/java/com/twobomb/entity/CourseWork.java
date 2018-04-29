@@ -2,6 +2,7 @@ package com.twobomb.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,10 @@ public class CourseWork extends AbstractEntity {
 //            joinColumns = @JoinColumn(name = "id_coursework"),
 //            inverseJoinColumns = @JoinColumn(name = "id_theme"))
 
+    public Map<Theme, Person> getThemesWithAffixedStudent() {
+        return themesWithAffixedStudent;
+    }
+
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinTable(name = "student_bind_theme_in_coursework",
             joinColumns = @JoinColumn(name = "id_coursework"),
@@ -44,12 +49,6 @@ public class CourseWork extends AbstractEntity {
         return name;
     }
 
-//    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
-//    @JoinTable(name = "theme_bind_coursework",
-//            joinColumns = @JoinColumn(name = "id_coursework"),
-//            inverseJoinColumns = @JoinColumn(name = "id_theme"))
-//    List<Theme> themes;
-
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
     @JoinTable(name = "theme_bind_coursework",
             joinColumns = @JoinColumn(name = "id_coursework"),
@@ -61,6 +60,8 @@ public class CourseWork extends AbstractEntity {
     List<TeacherInfo> teacherInfos;
 
     public List<Theme> getThemes() {
+        if(themes == null)
+            themes = new ArrayList<>();
         return themes;
     }
 

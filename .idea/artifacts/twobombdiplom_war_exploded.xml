@@ -112,8 +112,9 @@
           <element id="library" level="project" name="Maven: org.webjars.bowergithub.polymerelements:iron-a11y-announcer:2.1.0" />
           <element id="library" level="project" name="Maven: org.webjars.bowergithub.polymerelements:iron-overlay-behavior:2.3.3" />
           <element id="library" level="project" name="Maven: org.webjars.bowergithub.polymerelements:iron-a11y-keys-behavior:2.1.0" />
-          <element id="library" level="project" name="Maven: org.webjars.bowergithub.polymerelements:iron-resizable-behavior:2.1.0" />
           <element id="library" level="project" name="Maven: org.webjars.bowergithub.polymerelements:iron-fit-behavior:2.1.1" />
+          <element id="library" level="project" name="Maven: org.webjars.bowergithub.polymerelements:iron-collapse:2.2.0" />
+          <element id="library" level="project" name="Maven: org.webjars.bowergithub.polymerelements:iron-resizable-behavior:2.1.0" />
           <element id="library" level="project" name="Maven: org.springframework.boot:spring-boot:2.0.0.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-core:5.0.4.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-jcl:5.0.4.RELEASE" />

@@ -39,7 +39,6 @@ public class Application  {
 
 
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
-//        ctx.getBean("mytest");
 
     }
 

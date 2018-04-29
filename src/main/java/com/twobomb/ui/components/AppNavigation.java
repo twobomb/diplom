@@ -1,5 +1,6 @@
 package com.twobomb.ui.components;
 
+import com.twobomb.Utils.AppConst;
 import com.twobomb.app.security.SecurityUtils;
 import com.twobomb.entity.User;
 import com.vaadin.flow.component.Tag;
@@ -13,6 +14,9 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinServlet;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.templatemodel.TemplateModel;
 import org.apache.catalina.security.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,7 @@ public class AppNavigation extends PolymerTemplate<AppNavigation.Model> implemen
 	private String logoutHref;
 	private String defaultHref;
 	private String currentHref;
+	private String indexSegment;
 	@Autowired
 	User currentUser;
 
@@ -48,27 +53,36 @@ public class AppNavigation extends PolymerTemplate<AppNavigation.Model> implemen
 		}
 
 		tabs.addSelectedChangeListener(e -> navigate());
+
+
 	}
 
 	private void navigate() {
 		int idx = tabs.getSelectedIndex();
 		if (idx >= 0 && idx < hrefs.size()) {
 			String href = hrefs.get(idx);
+
 			if (href.equals(logoutHref)) {
 				// The logout button is a 'normal' URL, not Flow-managed but
 				// handled by Spring Security.
 				UI.getCurrent().getPage().executeJavaScript("location.assign('logout')");
-			} else if (!href.equals(currentHref)) {
+			}
+			else if (!href.equals(currentHref)) {
 				UI.getCurrent().navigate(href);
 			}
 		}
 	}
-
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
 		String href = event.getLocation().getFirstSegment().isEmpty() ? defaultHref
 				: event.getLocation().getFirstSegment();
+
 		currentHref = href;
+		if(event.getLocation().getSegments().size() >= 2)
+			indexSegment = event.getLocation().getSegments().get(1);
+		else
+			indexSegment = "";
+
 		tabs.setSelectedIndex(hrefs.indexOf(href));
 	}
 

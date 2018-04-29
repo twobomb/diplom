@@ -1,23 +1,25 @@
 package com.twobomb.service;
 
+import com.twobomb.Utils.AppConst;
 import com.twobomb.entity.*;
 import com.twobomb.repository.DiscinplineRepository;
 import com.twobomb.repository.GroupRepository;
 import com.twobomb.repository.PersonRepository;
-import net.bytebuddy.implementation.bytecode.Throw;
+import com.twobomb.ui.pages.CourseworkView;
+import com.twobomb.ui.pages.DisciplinesView;
+import com.twobomb.ui.pages.ThemeView;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
+import java.time.Period;
 import java.util.*;
 
 @SuppressWarnings("Duplicates")
@@ -39,44 +41,124 @@ public class DisciplineService {
 
     @Autowired
     ApplicationContext ctx;
+    public static String string_between_date(Date d1, Date d2){
+        long date1 = d1.getTime();
+        long date2 = d2.getTime();
+        long t = 0;
+        String res = "";
+        if(date1 > date2)
+            t = date1 - date2;
+        else
+            t= date2 - date1;
+        long days = t/1000/60/60/24;
+        long hours = t/1000/60/60;
+        long min = t/1000/60;
 
-    public HashMap<String,Object> getData_CV(Long dis_id){
+        if(days > 0 )
+            res += days + " " + trueRussianDecline("дней","день","дня", (int) days);
+        else if (hours > 0)
+            res += hours + " " + trueRussianDecline("часов","час","часа", (int) hours);
+        else
+            res += min + " " + trueRussianDecline("минут","минута","минуты", (int) min);
+        if(date1 > date2)
+            res+=" назад";
+        return res;
+    }                                 //example d1 дней       d2  день        d3 дня
+    public static String trueRussianDecline(String d1, String d2, String d3, int c){
+        String res = "";
+        switch (c%100){
+            case 11: case 12: case 13: case 14:return d1;
+            default:
+                switch (c%10){
+                    case 0:case 5:case 6:case 7:case 8:case 9:return d1;
+                    case 1: return d2;
+                    case 2:case 3:case 4: return d3;
+                }
+        }
+        return "";
+    }
 
+    public void addAttachThemeToPersonInCoursework(Integer indexCoursework, Integer indexTheme) throws Exception {
         User currentUser = ctx.getBean("CurrentUser",User.class);
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
-        if(dis_id >= 0 && dis_id < disciplineList.size())
-            disciplineList = new ArrayList<>(Collections.singleton(disciplineList.get(Math.toIntExact(dis_id))));
+        List<CourseWork> courseworksList = new ArrayList<>();
+        disciplineList.forEach( discipline -> courseworksList.addAll(discipline.getCourseWork()));
+        CourseWork currentCoursework;
+        if(indexCoursework >= 0 && indexCoursework < courseworksList.size())
+            currentCoursework = courseworksList.get(indexCoursework);
+        else
+            throw new Exception("Незвестный индекс курсовой");
+        List<Theme> themes = currentCoursework.getThemes();
+        Theme currentTheme;
+        if(indexTheme >= 0 && indexTheme < themes.size())
+            currentTheme = themes.get(indexTheme);
+        else
+            throw new Exception("Неизвестный индекс темы!");
+        List<Theme> freeThemes = getFreeThemeListFromCoursework(currentCoursework,currentUser.getPerson().getGroup());
+        if(!freeThemes.contains(currentTheme))
+            throw new Exception("К данной теме уже прикреплен студент!");
+        List<Theme> affix = currentUser.getPerson().getAffixThemesStudent();
+        for(Theme t:affix)
+            if(t.getCourseWorks().contains(currentCoursework))
+                throw new Exception("Вы уже закреплены к одной из тем в данной курсовой работе!");
+        currentTheme.addAttachStudentAndCoursework(currentUser.getPerson(),currentCoursework);
+
+
+    }
+    //Вернуть темы данной курсовой работы к которым никто не привязан из данной группы
+    public List<Theme> getFreeThemeListFromCoursework(CourseWork cw,Group group){
+        List<Theme> freeThemes = new ArrayList<>();
+        List<Person> studentsInGroup = group.getPersons();
+        Map<Theme,Person> affix =  cw.getThemesWithAffixedStudent();
+        for(Theme theme:cw.getThemes()){
+            boolean isFreeTheme = true;
+            for(Theme t :affix.keySet()){
+                if(t.equals(theme) && studentsInGroup.contains(affix.get(t))){
+                    isFreeTheme = false;
+                    break;
+                }
+            }
+            if(isFreeTheme)
+                freeThemes.add(theme);
+        }
+        return freeThemes;
+    }
+    public List<CourseworkView.CourseWorkInfo> getCourseWorkInfoList(Long disId){
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+        List<CourseWork> courseworksListMain = new ArrayList<>();
+        disciplineList.forEach( discipline -> courseworksListMain.addAll(discipline.getCourseWork()));
+        if(disId >= 0 && disId < disciplineList.size())
+            disciplineList = new ArrayList<>(Collections.singleton(disciplineList.get(Math.toIntExact(disId))));
 
         List<CourseWork> courseWorks = new ArrayList<>();
 
         for(Discipline discipline:disciplineList)
             courseWorks.addAll(discipline.getCourseWork());
 
-
-        List<String> courseworkName = new ArrayList<>();
-        List<String> disciplineName = new ArrayList<>();
-        List<String> prepodList = new ArrayList<>();
-        List<String> dateBegin = new ArrayList<>();
-        List<String> dateEnd = new ArrayList<>();
-        List<Boolean> isThemeChecked = new ArrayList<>();
+        List<CourseworkView.CourseWorkInfo> courseWorkInfos = new ArrayList<>();
+        int index = 1;
         for(CourseWork cw:courseWorks){
-            courseworkName.add(cw.getName());
-            disciplineName.add(cw.getDiscipline().getName());
+            CourseworkView.CourseWorkInfo courseWorkInfo = new CourseworkView.CourseWorkInfo();
+            courseWorkInfo.setIndex(index++);
+            courseWorkInfo.setIndexOfMainList(courseworksListMain.indexOf(cw)+1);
+            courseWorkInfo.setCourseworkName(cw.getName());
+            courseWorkInfo.setDisciplineName(cw.getDiscipline().getName());
             List<Person> teacherAttach = cw.getDiscipline().getAttachedTeachers();
             String teacherNames = "";
             for(Person teacher:teacherAttach)
                 teacherNames+=teacher.getLastname()+" "+teacher.getFirstname().charAt(0)+"., ";
             teacherNames = teacherNames.replaceFirst(", $","");
-            prepodList.add(teacherNames);
+            courseWorkInfo.setPrepodList(teacherNames);
             ControlDiscipline control = cw.getDiscipline().getControl_discipline();
             String begin = "неизвестно";
-            if(control.getDateBegin() != null)
+            if(control != null && control.getDateBegin() != null)
                 begin = new SimpleDateFormat("dd.MM.yyyy").format(control.getDateBegin());
-            dateBegin.add(begin);
+            courseWorkInfo.setDateBegin(begin);
             String end = "неизвестно";
-            if(control.getDateEnd() != null)
+            if(control != null && control.getDateEnd() != null)
                 end = new SimpleDateFormat("dd.MM.yyyy").format(control.getDateEnd());
-            dateEnd.add(end);
+            courseWorkInfo.setDateEnd(end);
             boolean isCheked = false;
             List<Theme> themeList = currentUser.getPerson().getAffixThemesStudent();
             for(Theme theme:themeList)
@@ -84,35 +166,170 @@ public class DisciplineService {
                     isCheked = true;
                     break;
                 }
-            isThemeChecked.add(isCheked);
+            courseWorkInfo.setIsThemeChecked(isCheked);
+            courseWorkInfos.add(courseWorkInfo);
+
         }
 
-        HashMap<String,Object> result = new HashMap<>();
-        result.put("courseworkName",courseworkName);
-        result.put("disciplineName",disciplineName);
-        result.put("prepodList",prepodList);
-        result.put("dateBegin",dateBegin);
-        result.put("dateEnd",dateEnd);
-        result.put("isThemeChecked",isThemeChecked);
-
-        return result;
+        return courseWorkInfos;
     }
-    public HashMap<String,Object> getData_DV(){
+    public ThemeView.AdditionalCourseWorkInfo getAdditionalCourseWorkInfo(Long indexCoursework){
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+        List<CourseWork> courseworksList = new ArrayList<>();
+        disciplineList.forEach( discipline -> courseworksList.addAll(discipline.getCourseWork()));
+
+        CourseWork currentCoursework = null;
+        if(indexCoursework >= 0 && indexCoursework < courseworksList.size())
+            currentCoursework = courseworksList.get(Math.toIntExact(indexCoursework));
+        else
+            return null;
+
+        ThemeView.AdditionalCourseWorkInfo info = new ThemeView.AdditionalCourseWorkInfo();
+        info.setGroupName(currentUser.getPerson().getGroup().getName());
+        info.setCourseworkName(currentCoursework.getName());
+        info.setDisciplineName(currentCoursework.getDiscipline().getName());
+        String teachersNames = "";
+        for(Person teacher:currentCoursework.getDiscipline().getAttachedTeachers())
+            teachersNames+=teacher.getLastname()+" "+teacher.getFirstname().charAt(0)+"., ";
+        teachersNames = teachersNames.replaceFirst(", $","");
+        info.setTeachers(teachersNames);
+        info.setIsAutoset(AppConst.DEFAULT_IS_AUTOSET);
+        info.setIsStudentChange(AppConst.DEFAULT_IS_STUDENT_CHANGE);
+        info.setIsStudentOffer(AppConst.DEFAULT_IS_STUDENT_OFFER);
+        info.setBeginDate("неизвестно");
+        info.setEndDate("неизвестно");
+        ControlDiscipline controlDiscipline = currentCoursework.getDiscipline().getControl_discipline();
+        if(controlDiscipline != null){
+            info.setIsAutoset(controlDiscipline.getIs_autoset());
+            info.setIsStudentOffer(controlDiscipline.getIs_student_offer());
+            info.setIsStudentChange(controlDiscipline.getIs_student_change());
+            String beginDate = "";
+            Date now = Calendar.getInstance().getTime();
+            if(controlDiscipline.getDateBegin().before(now))
+                beginDate += "началось ";
+            else
+                beginDate += "начнется через ";
+            beginDate += string_between_date(now,controlDiscipline.getDateBegin())+" ";
+            beginDate += new SimpleDateFormat("dd.MM.yyyy").format(controlDiscipline.getDateBegin());
+
+            String endDate = "";
+            if(controlDiscipline.getDateEnd().before(now))
+                endDate  += "закончится ";
+                else
+                endDate += " через ";
+            endDate  += string_between_date(now,controlDiscipline.getDateEnd())+" ";
+            endDate  += new SimpleDateFormat("dd.MM.yyyy").format(controlDiscipline.getDateEnd());
+
+
+            info.setBeginDate(beginDate);
+            info.setEndDate(endDate);
+        }
+        int courseNeedThemes = 0;
+        List<Person> teachers =  currentCoursework.getDiscipline().getAttachedTeachers();
+        for(Person teacher:teachers){
+            List<TeacherInfo> teacherInfos =  teacher.getTeacherInfos();
+            for(TeacherInfo ti:teacherInfos)
+                if(ti.getCourseWork().equals(currentCoursework))
+                    courseNeedThemes+=ti.getCount_theme();
+        }
+        courseNeedThemes = courseNeedThemes - currentCoursework.getThemes().size();
+        info.setTeachersMustAddCount(courseNeedThemes);
+        return info;
+
+    }
+    public List<ThemeView.ThemeItemInfo> getThemeItemInfoList(Long indexCoursework){
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+        List<CourseWork> courseworksList = new ArrayList<>();
+        disciplineList.forEach( discipline -> courseworksList.addAll(discipline.getCourseWork()));
+
+        List<Theme> themeList = null;
+        CourseWork currentCoursework = null;
+        List<ThemeView.ThemeItemInfo> themeItemInfoList = new ArrayList<>();
+        if(indexCoursework >= 0 && indexCoursework < courseworksList.size()) {
+            currentCoursework = courseworksList.get(Math.toIntExact(indexCoursework));
+            themeList = currentCoursework.getThemes();
+        }
+        else
+            return themeItemInfoList;
+        int index = 1;
+        for(Theme t:themeList){
+            ThemeView.ThemeItemInfo themeItemInfo = new ThemeView.ThemeItemInfo();
+            themeItemInfo.setTeacherAdd(t.getAdd_person().getLastname()+" "+ t.getAdd_person().getFirstname().charAt(0)+".");
+            themeItemInfo.setDescription(t.getDescription().isEmpty()?"Описание отсутствует":t.getDescription());
+            themeItemInfo.setName(t.getText());
+            String editedBy = "";
+            if(t.getEdit_person() != null && t.getEdit_date()!= null){
+                editedBy = "Отредактировал ";
+                editedBy+=t.getEdit_person().getUser().getRole().getRole_name()+" ";
+                editedBy+=t.getEdit_person().getLastname()+" "+t.getEdit_person().getFirstname().charAt(0)+ " ";
+                editedBy+= new SimpleDateFormat("dd.MM.yyyy").format(t.getEdit_date());
+            }
+            themeItemInfo.setEdited(editedBy);
+            themeItemInfo.setIndex(index++);
+            //Можно ли прикрепится к теме
+            Map<CourseWork,Person> mapTmp =  t.getCoueseworkWidthAffixedStudents();
+            Map<CourseWork,Person> map =  new HashMap<CourseWork,Person>();
+            //Исключает студентов не нашей группы
+            for(CourseWork key:mapTmp.keySet()){
+                if(mapTmp.get(key).getGroup().equals(currentUser.getPerson().getGroup()))
+                    map.put(key,mapTmp.get(key));
+            }
+            Person studentAttachToThisTheme = map.get(currentCoursework);
+            themeItemInfo.setIsCanAttach(studentAttachToThisTheme == null);
+            //Определение статуса
+            themeItemInfo.setIsCanAttach(false);
+            themeItemInfo.setIsCurrentUserAttach(false);
+            if(studentAttachToThisTheme == null) {
+                themeItemInfo.setStatus("Тема свободна");
+                if(!isPersonAttachToThemeInCoursework(currentUser.getPerson(),currentCoursework))
+                    themeItemInfo.setIsCanAttach(true);
+            }
+            else if(studentAttachToThisTheme.equals(currentUser.getPerson())){
+                themeItemInfo.setStatus("Вы закреплены за этой темой");
+                themeItemInfo.setIsCurrentUserAttach(true);
+            }
+            else
+                themeItemInfo.setStatus("За темой закреплен "+studentAttachToThisTheme.getLastname()+" "+studentAttachToThisTheme.getFirstname().charAt(0)+".");
+            //Disabled статус кнопок прязвки в завимости от времени
+            ControlDiscipline controlDiscipline =currentCoursework.getDiscipline().getControl_discipline();
+            Date now = Calendar.getInstance().getTime();
+            if(controlDiscipline == null ||
+                    controlDiscipline.getDateBegin().after(now) ||
+                    controlDiscipline.getDateEnd().before(now)){
+                themeItemInfo.setIsDisabledAttachBtn(true);
+                themeItemInfo.setIsDisabledDetachBtn(true);
+            }else{
+                themeItemInfo.setIsDisabledAttachBtn(false);
+                themeItemInfo.setIsDisabledDetachBtn(false);
+            }
+            themeItemInfoList.add(themeItemInfo);
+        }
+        return themeItemInfoList;
+    }
+    public boolean isPersonAttachToThemeInCoursework(Person p, CourseWork c){
+        for(Theme t:c.getThemes())
+            if(t.getCoueseworkWidthAffixedStudents().get(c) != null)
+                if(t.getCoueseworkWidthAffixedStudents().get(c).equals(p))
+                    return true;
+        return false;
+    }
+    public boolean isAttachedThemeToCoursework(Theme t,CourseWork c){
+        return c.getThemes().contains(t);
+    }
+    public List<DisciplinesView.DisciplineInfo> getDisciplineInfoList(){
         User currentUser = ctx.getBean("CurrentUser",User.class);
         Person person = currentUser.getPerson();
-//            person = session.get(person.getClass(), person.getId());
-        HashMap<String,Object> result = new HashMap<>();
-        List<String> disciplineName = new ArrayList<>();
-        List<Integer> courseworkCount = new ArrayList<>();
-        List<Boolean> isChecked = new ArrayList<>();
-        List<Boolean> isNotChecked = new ArrayList<>();
 
         List<Discipline> list = getBindDisciplineWidthUser(currentUser);
-
+        List<DisciplinesView.DisciplineInfo> disciplineInfos = new ArrayList<>();
+        int index = 1;
         for (Discipline l : list) {
-//                l = session.get(Discipline.class, l.getId());
-            courseworkCount.add(l.getCourseWork().size());
-            disciplineName.add(l.getName());
+            DisciplinesView.DisciplineInfo disciplineInfo = new DisciplinesView.DisciplineInfo();
+            disciplineInfo.setIndex(index++);
+            disciplineInfo.setCourseworkCount(l.getCourseWork().size());
+            disciplineInfo.setDisciplineName(l.getName());
 
             //Курсовые работы дисциплины
             List<CourseWork> courseWorks = l.getCourseWork();
@@ -121,8 +338,8 @@ public class DisciplineService {
 
             //Проверка во всех ли курсовых данного предмета есть привязанная тема данного студента
             Boolean isCheckedTmp = true;
-            for (CourseWork cw : courseWorks) {
-                List<Theme> cwThemes = cw.getThemes();
+                for (CourseWork cw : courseWorks) {
+                    List<Theme> cwThemes = cw.getThemes();
                 boolean flag = false;
                 for (Theme studTheme : themeAffix) {
                     if (cwThemes.contains(studTheme)) {
@@ -135,16 +352,11 @@ public class DisciplineService {
                     break;
                 }
             }
-            isChecked.add(isCheckedTmp);
-            isNotChecked.add(!isCheckedTmp);
-
+            disciplineInfo.setIsChecked(isCheckedTmp);
+            disciplineInfos.add(disciplineInfo);
         }
-        result.put("courseworkCount",courseworkCount);
-        result.put("disciplineName",disciplineName);
-        result.put("isChecked",isChecked);
-        result.put("isNotChecked",isNotChecked);
 
-        return result;
+        return disciplineInfos;
     }
     public void attachGroup(Group group,Discipline discipline){
         SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
@@ -188,20 +400,15 @@ public class DisciplineService {
             }
         }
         person = session.get(Person.class,person.getId());
-//        discipline = session.get(Discipline.class,discipline.getId());
         person.addDisciplineTeacher(discipline);
         personRepository.save(person);
     }
     public List<Discipline> getAll(){
         return discinplineRepository.findAll();
     }
-    //Достать дисциплины связанные с пользователем
 
-//    @Autowired
-//    SessionFactory sessionFactory;
     public List<Discipline> getBindDisciplineWidthUser(User user){
 
-//        Session session = sessionFactory.openSession();
         List<Discipline> res = new ArrayList<>();
         try {
             switch (user.getRole().getRole()) {
@@ -210,16 +417,11 @@ public class DisciplineService {
                     break;
                 case Role.STUDENT: {
                     Group group = user.getPerson().getGroup();
-//                    session.update(group);
                     res = group.getDisciplines();
-//                for (Discipline d : res)
-//                    if (d.getCourseWork().size() == 0)
-//                        res.remove(d);
                 }
                 break;
                 case Role.TEACHER: {
                     Person p = user.getPerson();
-//                    session.update(p);
                     res = p.getDisciplinesTeacher();
                 }
                 break;
@@ -231,7 +433,6 @@ public class DisciplineService {
             e.printStackTrace();
         }
         finally {
-//            session.close();
         }
     return res;
     }

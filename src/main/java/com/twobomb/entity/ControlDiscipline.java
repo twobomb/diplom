@@ -1,5 +1,6 @@
 package com.twobomb.entity;
 
+import com.twobomb.Utils.AppConst;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -52,6 +53,9 @@ public class ControlDiscipline extends AbstractEntity{
     Discipline discipline;
 
     public ControlDiscipline() {
+        this.is_student_change = AppConst.DEFAULT_IS_STUDENT_CHANGE;
+        this.is_autoset = AppConst.DEFAULT_IS_AUTOSET;
+        this.is_student_offer = AppConst.DEFAULT_IS_STUDENT_OFFER;
     }
 
     public Discipline getDiscipline() {

@@ -13,6 +13,7 @@ import org.hibernate.*;
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 @SpringComponent
@@ -65,31 +63,73 @@ public class DataGeneration {
     LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean;
 
 
+    @Autowired
+    Environment environment;
     @PostConstruct
     public void create(){
+        //Если типа update То генератор не сработает
+        if(environment.getProperty("spring.jpa.properties.hibernate.hbm2ddl.auto").equals("update"))
+            return;
+        createRoles();
+        createUsers();
+        createGroups();
 
-//        createRoles();
-//        createUsers();
-//        createGroups();
-//
-//        createPerson();
-//
-//        createDisciplines();
-//        createCourseworks();
-//
-//        //Привязка преподователей к дисциплинам
-//        bindTeacherToDisciplines();
-//        //Привязка дисциплин к группам
-//        bindGroupsToDisciplines();
-//        //Назначение кол-ва тем которые преподаватель должен подать к каждой привязанной к нему курсовой
-//        createTeacherInfoCoursework();
-//
-//        //Генерация рандомным дисциплинам(не всем) рандомных параметров
-//        createDisciplineControl();
-//
-//        //Генерирует темы
-//        createThemes();
+        createPerson();
 
+        createDisciplines();
+        createCourseworks();
+
+        //Привязка преподователей к дисциплинам
+        bindTeacherToDisciplines();
+        //Привязка дисциплин к группам
+        bindGroupsToDisciplines();
+        //Назначение кол-ва тем которые преподаватель должен подать к каждой привязанной к нему курсовой
+        createTeacherInfoCoursework();
+
+        //Генерация рандомным дисциплинам(не всем) рандомных параметров
+        createDisciplineControl();
+
+        //Генерирует темы
+        createThemes();
+
+        //Привязывает студентов к темам
+        bindStudentsToTheme();
+
+    }
+
+    private void bindStudentsToTheme() {
+        SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
+        Session session = sessionFactory.openSession();
+        try {
+            List<Discipline> disciplineList = discinplineRepository.findAll();
+            List<CourseWork> courseworksList = new ArrayList<>();
+            disciplineList.forEach( discipline -> courseworksList.addAll(discipline.getCourseWork()));
+
+            for(CourseWork cw:courseworksList){
+                cw = session.get(cw.getClass(),cw.getId());
+                List<Group> groupList = cw.getDiscipline().getGroups();
+                for(Group group:groupList){
+                    List<Theme> freeThemes = disciplineService.getFreeThemeListFromCoursework(cw,group);
+                    for(Person student:group.getPersons()){
+                        //50% что студент будет привязан к теме
+                        if(freeThemes.size()>0 && rnd.nextBoolean() ){
+                            Theme rndTheme = freeThemes.get(rnd.nextInt(freeThemes.size()));
+                            freeThemes.remove(rndTheme);
+                            rndTheme.addAttachStudentAndCoursework(student,cw);
+                            themeRepository.save(rndTheme);
+                        }
+                    }
+                }
+            }
+            themeRepository.flush();
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            session.close();
+        }
     }
 
     public void createPerson(){
@@ -117,6 +157,7 @@ public class DataGeneration {
             String[] themes = new String[]{"Основные тенденции изменений в области экономической активности и занятости населения", "Население и общественное здоровье как составляющая часть человеческого потенциалаРоссийского общества", "Влияние миграционных процессов на человеческий потенциал Российской Федерации", "Образование и развитие человеческого потенциала в России", "Непрерывность образования как составляющая часть человеческого потенциала Российского общества", "Региональные аспекты развития человеческого потенциала", "Социальные болезни(преступность, наркомания и терроризм) Российского общества и их влияние на развитие человеческого потенциала", "Сравнительная характеристикаиспользованиякатегории«минимальная заработная плата» в Российской Федерации и за рубежом", "Демографические характеристики, структуры семьи и рынка труда в России", "Теневая экономика в Российской Федерациии ее влияние на российский рыноктруда", "Дискриминация на рынке труда", "Механизмы существующей защиты населения в России", "Проблемы занятости уязвимых групп населения России Экономическое неравенствои бедность в России", "Реформирование российской системы образования и его влияние на рынок труда", "Культурная свобода и развитие человеческого потенциала", "Социальное партнерствои рыноктруда РФ", "Роль профсоюзов России в социально-трудовых отношениях Забастовочное движение", "Инновационный подход в профессиональномобразовании", "Воспроизводство человеческого капиталав инновационной экономике", "Сущность ивиды человеческого капитала в инновационной экономике", "Национальные проекты России и их влияние на развитие человеческого потенциала", "Имеет ли смысл человеку спорить с судьбой? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Зачем человек бросает вызов судьбе? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Спорить с судьбой или принимать её? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Какие произведения М. Ю. Лермонтова Вы бы посоветовали прочитать другу? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Лермонтов в Вашем читательском опыте. (По одному или нескольким произведениям М. Ю. Лермонтова)", "Жизнь – это поединок? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Что Вам ближе в героях М. Ю. Лермонтова: стремление к одиночеству или бегство от него? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Неужели зло так привлекательно? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Какая из мыслей М. Ю. Лермонтова Вам ближе: «Я ищу свободы и покоя» или «Так жизнь скучна, когда боренья нет»? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Что обрекает человека на одиночество? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Какие поднятые М.Ю. Лермонтовым проблемы современны и сегодня? (По одному или нескольким произведениям М. Ю. Лермонтова)", "Помогает ли литература человеку познать самого себя?", "Какие нравственные уроки, с Вашей точки зрения, может преподать литература?", "Кого из литературных героев Вы узнаёте в своих современниках?", "Кого из литературных героев Вы понимаете, но не принимаете?", "Какой герой Вам ближе: созерцающий жизнь или преобразующий её?", "Какие вопросы задаёт жизни литература?", "Можно ли обойтись без книг?", "Согласны ли Вы с утверждением А. Н. Толстого: «Хорошая книга – точно беседа с умным человеком»?", "Кто из героев литературы Вам интересен и почему?", "Кто для Вас идеальный герой литературы?", "Способна ли книга сделать человека лучше?", "Как богата Россия хорошими людьми! (А. П. Чехов)", "Легко ли говорить правду?", "Возможно ли полное взаимопонимание между людьми?", "Чем страшен эгоизм?", "Трусость и предательство: как связаны эти понятия?", "Согласны ли Вы с утверждением одного из героев Д.И. Фонвизина: «Совесть… остерегает прежде, нежели судья наказывает»?", "Почему так важно научиться понимать другого?", "Почему важно уметь сострадать другому?", "Всегда ли любовь делает человека счастливым?", "Возможна ли жизнь без идеала?", "Чем опасна вседозволенность?", "Анализ глобальной политики стран определяющих ход мировой истории", "Военные и экономические блоки", "Глобализация мира за и против, моя оценка", "Яркие политики современного времени, биографии политиков.", "Тероризм в России, факты илюстрации, причины возникновения., прогнозы.", "Современные политики России, биографии, факты из жизни, аналитическая оценка", "Если бы я был презедентом России, мои реформы, законы, действия.", "Династия и история русских царей", "Президенты США, биографии, илюстрации, оценка.", "Великие войны и завоеватели", "История и сущность возникновения и действия религиозных орденов (тамплинеры, крестоносцы, массоны, иезуиты)", "Великие исторические личности,оказавшие влияние на исторический процес развития мира, биографии, фото, анализ (Александр Македонский, Платон, Наполеон, Маркс, Ленин, Гитлер, Сталин)", "Культура древнего Египта, Пирамиды, история религиии фароаонов, иероглифы письменость, фотогалерея, история мифы", "История, культура древнего Китая", "История, культура древней Индии", "История, культура древней Греции", "История древних славян (Гумелев, Асов)", "История, культура древней Иудеи, иудаизм, кабала, тора"};
             String description = "Lorem ipsum – псевдо-латинский текст, который используется для веб дизайна, типографии, оборудования, и распечатки вместо английского текста для того, чтобы сделать ударение не на содержание, а на элементы дизайна. Такой текст также называется как заполнитель. Это очень удобный инструмент для моделей (макетов). Он помогает выделить визуальные элементы в документе или презентации, например текст, шрифт или разметка. Lorem ipsum по большей части является элементом латинского текста классического автора и философа Цицерона. Слова и буквы были заменены добавлением или сокращением элементов, поэтому будет совсем неразумно пытаться передать содержание; это не гениально, не правильно, используется даже не понятный латинский. Хотя Lorem ipsum напоминает классический латинский, вы не найдете никакого смысла в сказанном. Поскольку текст Цицерона не содержит буквы K, W, или Z, что чуждо для латинского, эти буквы, а также многие другие часто вставлены в случайном порядке, чтобы скопировать тексты различных Европейских языков, поскольку диграфы не встречаются в оригинальных текстах.В профессиональной сфере часто случается так, что личные или корпоративные клиенты заказывают, чтобы публикация была сделана и представлена еще тогда, когда фактическое содержание все еще не готово. Вспомните новостные блоги, где информация публикуется каждый час в живом порядке. Тем не менее, читатели склонны к тому, чтобы быть отвлеченными доступным контентом, скажем, любым текстом, который был скопирован из газеты или интернета. Они предпочитают сконцентрироваться на тексте, пренебрегая разметкой и ее элементами. К тому же, случайный текст подвергается риску быть неумышленно смешным или оскорбительным, что является неприемлемым риском в корпоративной среде. Lorem ipsum, а также ее многие варианты были использованы в работе начиная с 1960-ых, и очень даже похоже, что еще с 16-го века.";
             List<Person> personList = personService.getByRole(Role.TEACHER);
+            List<Person> adminList = personService.getByRole(Role.ADMIN);
             for (Person teacher : personList) {
                 teacher = (Person) session.merge(teacher);
                 List<TeacherInfo> teacherInfos = teacher.getTeacherInfos();
@@ -135,9 +176,13 @@ public class DataGeneration {
                         for (int i = 0; i < generationThemesCount; i++) {
                             String desc = description.substring(0, rnd.nextInt(description.length()));
                             //30% Что у темы нет описания
-                            if (rnd.nextDouble() < 30)
+                            if (rnd.nextDouble() < 0.30)
                                 desc = "";
                             Theme theme = new Theme(desc, themes[rnd.nextInt(themes.length)], teacher);
+                            //30% что тему кто то отредактировал из админов
+                            if(rnd.nextDouble() < 0.30 && adminList.size() > 0)
+                                theme.setText(theme.getText()+"  edited",adminList.get(rnd.nextInt(adminList.size())));
+
                             theme.addCourseWork(cw);
 
                             themeRepository.save(theme);
@@ -159,11 +204,18 @@ public class DataGeneration {
         List<User> users = userRepository.findAll();
         users.removeIf(x -> !x.getRole().getRole().equals(Role.TEACHER));
         List<Discipline> disciplineList = discinplineRepository.findAll();
-        for(Discipline d:disciplineList)
-            for(User u:users)
+        for(Discipline d:disciplineList) {
+            int cnt = 0;
+            for (User u : users)
                 //20% что эта дисциплина будет привязна к любому преподу
-                if(rnd.nextDouble() < 0.20)
-                    disciplineService.attachTeacher(u.getPerson(),d);
+                if (rnd.nextDouble() < 0.20) {
+                    disciplineService.attachTeacher(u.getPerson(), d);
+                    cnt++;
+                }
+                //Если к дисциплине не привязался не один препод, привязать вручную одного случайного
+            if(cnt == 0 && users.size() > 0)
+                disciplineService.attachTeacher(users.get(rnd.nextInt(users.size())).getPerson(), d);
+        }
     }
     //Привязка групп к дисциплинам
     public void bindGroupsToDisciplines(){
@@ -228,8 +280,8 @@ public class DataGeneration {
                         maxStudentsInGroup = countStudents;
                 }
                 List<Person> teachers = d.getAttachedTeachers();
-                int curCount = 0;
                 for (CourseWork cw : courseWorks) {
+                    int curCount = 0;
                     for (int i = 0; i < teachers.size(); i++) {
                         int tmpCount = 0;
                         if (i == teachers.size() - 1)

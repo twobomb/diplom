@@ -23,4 +23,15 @@ public class AppConst {
     public static final String TITLE_LOGOUT = "Выход";
 
 
+
+    //Дефолтные параметры дисцплин
+    //Студент может предлагать тему
+    public static final Boolean DEFAULT_IS_STUDENT_OFFER = false;
+    //По завершении автораспределние тем
+    public static final Boolean DEFAULT_IS_AUTOSET = false;
+    //Студент может поменять тему после того как прикрепился
+    public static final Boolean DEFAULT_IS_STUDENT_CHANGE = true;
+
+
+
 }

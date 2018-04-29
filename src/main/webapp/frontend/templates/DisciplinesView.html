@@ -45,6 +45,7 @@
                 background: var(--lumo-shade-40pct);
             }
             vaadin-list-box>vaadin-item{
+                cursor:pointer;
                 -webkit-user-select: none;
                 -moz-user-select: none;
                 -ms-user-select: none;
@@ -69,22 +70,22 @@
 
         <vaadin-list-box id="listDisciplines">
 
-            <template is="dom-repeat" items="{{disc_info}}">
+            <template is="dom-repeat" items="{{disciplineInfo}}">
                 <vaadin-item on-click="handleClick">
                     <div class="index">{{item.index}}</div>
-                    <div class="name">{{item.name}}</div>
+                    <div class="name">{{item.disciplineName}}</div>
                     <div class="block_info">
                         <template is="dom-if" if="{{item.isChecked}}">
                             <div class="status theme_checked">
                                 <iron-icon icon="vaadin:vaadin:check" ></iron-icon>Темы выбраны
                             </div>
                         </template>
-                        <template  class="theme_not_checked" is="dom-if" if="{{item.isNotChecked}}">
+                        <template  class="theme_not_checked" is="dom-if" if="{{!item.isChecked}}">
                             <div class="status theme_not_checked">
                                 <iron-icon icon="vaadin:vaadin:form" ></iron-icon>Необходимо выбрать темы
                             </div>
                         </template>
-                        <div class="count"><iron-icon icon="vaadin:vaadin:file-text-o"></iron-icon>Курсовых {{item.count}}</div>
+                        <div class="count"><iron-icon icon="vaadin:vaadin:file-text-o"></iron-icon>Курсовых {{item.courseworkCount}}</div>
                     </div>
                 </vaadin-item>
             </template>
@@ -98,15 +99,6 @@
 
             connectedCallback(){
                 super.connectedCallback();
-                this.disc_info = [];
-                for(var i = 0; i < this.disciplineNames.length;i++)
-                    this.disc_info.push({
-                        index:(i+1),
-                        name:this.disciplineNames[i],
-                        count:this.courseworkCount[i],
-                        isChecked:this.themeChecked[i],
-                        isNotChecked:this.themeNotChecked[i]
-                    });
 
             }
             handleClick(e){
@@ -118,14 +110,7 @@
 
             static get properties() {
                 return {
-                    is_theme_not_checked: {
-                        type: Boolean,
-                        value: false
-                    },
-                    is_theme_checked:{
-                        type: Boolean,
-                        value: false
-                    }
+
                 };
             }
         }

@@ -12,6 +12,7 @@ import java.util.*;
 @Table(name = "themes")
 public class Theme extends AbstractEntity{
 
+    @Type(type = "text")
     @Column(name="description")
     String description;
 
@@ -22,12 +23,12 @@ public class Theme extends AbstractEntity{
     @Column(name = "edit_date")
     Date edit_date;
 
-    @ColumnDefault("now()")
     @Column(name = "date")
+    @ColumnDefault("now()")
     Date date;
 
     @JoinColumn(name = "id_edit_person")
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     Person edit_person;
 
 
@@ -41,6 +42,21 @@ public class Theme extends AbstractEntity{
         }
         else
             return false;
+    }
+
+    public Theme() {
+    }
+
+    public void setDescription(String description,Person whoEdited) {
+        this.description = description;
+        this.edit_person = whoEdited;
+        this.edit_date = Calendar.getInstance().getTime();
+    }
+
+    public void setText(String text, Person whoEdited) {
+        this.text = text;
+        this.edit_person = whoEdited;
+        this.edit_date = Calendar.getInstance().getTime();
     }
 
     public Theme(String description, String text, @NotNull Person add_person) {
@@ -66,6 +82,20 @@ public class Theme extends AbstractEntity{
 //    @JoinTable(name = "student_bind_theme_in_coursework",
 //            joinColumns = @JoinColumn(name = "id_theme"),
 //            inverseJoinColumns = @JoinColumn(name = "id_person_student"))
+    public void addAttachStudentAndCoursework(Person student,CourseWork cw){
+        try{
+            if(!student.getUser().getRole().getRole().equals(Role.STUDENT))
+                throw new Exception("Role this person not equals "+Role.STUDENT);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
+        coueseworkWidthAffixedStudents.put(cw,student);
+    }
+    public Map<CourseWork, Person> getCoueseworkWidthAffixedStudents() {
+        return coueseworkWidthAffixedStudents;
+    }
 
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinTable(name = "student_bind_theme_in_coursework",
