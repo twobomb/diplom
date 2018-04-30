@@ -1,41 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c1570e9f-7fb3-4c7c-b959-a7f2d0092be9" name="Default" comment="add theme page">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_webjars_bowergithub_polymerelements_iron_collapse_2_2_0.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/ThemeView.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/webapp/frontend/templates/ThemeView.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/Application.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/Application.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/Utils/AppConst.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/Utils/AppConst.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/app/DataGeneration.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/app/DataGeneration.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/entity/CourseWork.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/entity/CourseWork.class" />
+    <list default="true" id="c1570e9f-7fb3-4c7c-b959-a7f2d0092be9" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_webjars_bowergithub_polymerelements_font_roboto_1_1_0.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_webjars_bowergithub_polymerelements_paper_styles_2_1_0.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_webjars_bowergithub_polymerelements_paper_tooltip_2_1_1.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/entity/Theme.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/entity/Theme.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/service/DisciplineService.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/service/DisciplineService.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/ui/MainView.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/ui/MainView.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/ui/components/AppNavigation.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/ui/components/AppNavigation.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/ui/pages/DisciplinesView$Model.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/ui/pages/DisciplinesView$Model.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/twobomb/ui/pages/DisciplinesView.class" afterPath="$PROJECT_DIR$/target/classes/com/twobomb/ui/pages/DisciplinesView.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/twobombdiplom_war_exploded.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/twobombdiplom_war_exploded.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/Application.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/Application.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/Utils/AppConst.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/Utils/AppConst.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/app/DataGeneration.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/app/DataGeneration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/entity/ControlDiscipline.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/entity/ControlDiscipline.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/entity/CourseWork.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/entity/CourseWork.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/entity/Theme.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/entity/Theme.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/service/DisciplineService.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/service/DisciplineService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/components/AppNavigation.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/components/AppNavigation.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/CourseworkView.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/CourseworkView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/DisciplinesView.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/DisciplinesView.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/ThemeView.java" afterPath="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/ThemeView.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/application.properties" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/frontend/templates/CourseworkView.html" afterPath="$PROJECT_DIR$/src/main/webapp/frontend/templates/CourseworkView.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/frontend/templates/DisciplinesView.html" afterPath="$PROJECT_DIR$/src/main/webapp/frontend/templates/DisciplinesView.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/frontend/templates/LoginView.html" afterPath="$PROJECT_DIR$/src/main/webapp/frontend/templates/LoginView.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/frontend/templates/MainView.html" afterPath="$PROJECT_DIR$/src/main/webapp/frontend/templates/MainView.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/application.properties" afterPath="$PROJECT_DIR$/target/classes/application.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/frontend/templates/ThemeView.html" afterPath="$PROJECT_DIR$/src/main/webapp/frontend/templates/ThemeView.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/twobombdiplom.iml" afterPath="$PROJECT_DIR$/twobombdiplom.iml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -60,11 +40,33 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ThemeView.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ThemeView.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/frontend/templates/ThemeView.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="1" column="45" lean-forward="false" selection-start-line="1" selection-start-column="45" selection-end-line="1" selection-end-column="45" />
+            <state relative-caret-position="203">
+              <caret line="275" column="142" lean-forward="false" selection-start-line="275" selection-start-column="142" selection-end-line="275" selection-end-column="142" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DataGeneration.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/app/DataGeneration.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1603">
+              <caret line="146" column="38" lean-forward="false" selection-start-line="146" selection-start-column="38" selection-end-line="146" selection-end-column="38" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="application.properties" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" column="45" lean-forward="true" selection-start-line="4" selection-start-column="45" selection-end-line="4" selection-end-column="45" />
               <folding />
             </state>
           </provider>
@@ -73,39 +75,22 @@
       <file leaf-file-name="ThemeView.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/ThemeView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="46" column="43" lean-forward="false" selection-start-line="46" selection-start-column="43" selection-end-line="46" selection-end-column="43" />
+            <state relative-caret-position="248">
+              <caret line="256" column="27" lean-forward="false" selection-start-line="256" selection-start-column="27" selection-end-line="257" selection-end-column="115" />
               <folding>
-                <element signature="e#1114#1115#0" expanded="true" />
-                <element signature="e#1172#1173#0" expanded="true" />
                 <element signature="class#AdditionalCourseWorkInfo#0;class#ThemeView#0" expanded="false" />
                 <element signature="class#ThemeItemInfo#0;class#ThemeView#0" expanded="false" />
-                <element signature="e#4667#4668#0" expanded="true" />
-                <element signature="e#4719#4720#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DisciplineService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/service/DisciplineService.java">
+      <file leaf-file-name="AppNavigation.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/ui/components/AppNavigation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="102" column="94" lean-forward="false" selection-start-line="102" selection-start-column="94" selection-end-line="102" selection-end-column="94" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="method#string_between_date#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#trueRussianDecline#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#getCourseWorkInfoList#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#getThemeItemInfoList#0;class#DisciplineService#0" expanded="false" />
-                <element signature="e#13030#13049#0" expanded="true" />
-                <element signature="method#isPersonAttachToThemeInCoursework#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#getDisciplineInfoList#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#attachGroup#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#attachTeacher#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#getBindDisciplineWidthUser#0;class#DisciplineService#0" expanded="false" />
-                <element signature="method#getCourseWorkWithUser#0;class#DisciplineService#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="238">
+              <caret line="65" column="16" lean-forward="false" selection-start-line="65" selection-start-column="16" selection-end-line="65" selection-end-column="16" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -123,15 +108,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>theme</find>
-      <find>expires</find>
-      <find>themeischecked</find>
-      <find>theme_not_checked</find>
-      <find>navigate</find>
-      <find>edit_date</find>
-      <find>@medi</find>
-      <find>@me</find>
-      <find>iron-ic</find>
       <find>theme_bind_coursework_bind_student</find>
       <find>localContainerEntityManagerFactoryBean</find>
       <find>isD</find>
@@ -153,6 +129,15 @@
       <find>attachBlock</find>
       <find>от</find>
       <find>indexAttachTheme</find>
+      <find>disab</find>
+      <find>e</find>
+      <find>isdis</find>
+      <find>alert</find>
+      <find>test</find>
+      <find>setErr</find>
+      <find>Откр</find>
+      <find>isdi</find>
+      <find>закончи</find>
     </findStrings>
     <replaceStrings>
       <replace>TITLE</replace>
@@ -211,24 +196,24 @@
         <option value="$PROJECT_DIR$/src/main/webapp/frontend/components/app-navigation.html" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/ui/MainView.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/DisciplinesView.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/twobomb/ui/components/AppNavigation.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/frontend/templates/DisciplinesView.html" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/CourseworkView.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/app/security/SecurityConfiguration.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/frontend/templates/MainView.html" />
         <option value="$PROJECT_DIR$/src/main/webapp/frontend/templates/LoginView.html" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/entity/CourseWork.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/frontend/templates/CourseworkView.html" />
-        <option value="$PROJECT_DIR$/src/main/java/com/twobomb/entity/Theme.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/Utils/AppConst.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/entity/ControlDiscipline.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/app/DataGeneration.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/Application.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/twobomb/entity/Theme.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/frontend/templates/ThemeView.html" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/service/DisciplineService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/ThemeView.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/twobomb/ui/components/AppNavigation.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
       </list>
     </option>
   </component>
@@ -314,7 +299,10 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -485,9 +473,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="AndroidView" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -661,7 +646,8 @@
       <workItem from="1524854464912" duration="1738000" />
       <workItem from="1524906427768" duration="9308000" />
       <workItem from="1524931435888" duration="13259000" />
-      <workItem from="1525002308376" duration="34586000" />
+      <workItem from="1525002308376" duration="34633000" />
+      <workItem from="1525078589444" duration="8555000" />
     </task>
     <task id="LOCAL-00001" summary="add net DataGenerator functions">
       <created>1524607796664</created>
@@ -677,11 +663,18 @@
       <option name="project" value="LOCAL" />
       <updated>1524696993911</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="add theme page">
+      <created>1525045072241</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1525045072241</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="351539000" />
+    <option name="totallyTimeSpent" value="360141000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -707,27 +700,27 @@
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34594595" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32884097" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32837838" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32884097" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25945947" sideWeight="0.49713466" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25945947" sideWeight="0.49713466" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972974" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32837838" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32837838" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295129" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36103153" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36604583" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Bean Validation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32567567" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32837838" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32567567" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -778,15 +771,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/twobomb/service/DisciplineService.java</url>
-          <line>96</line>
-          <properties />
-          <option name="timeStamp" value="139" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="142" />
+      <option name="time" value="145" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="MavenRunConfiguration">
@@ -832,22 +817,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/ui/components/AppNavigation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="33" column="51" lean-forward="true" selection-start-line="33" selection-start-column="51" selection-end-line="33" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="139" column="36" lean-forward="false" selection-start-line="139" selection-start-column="36" selection-end-line="139" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/app/security/CustomRequestCache.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -859,7 +828,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-102">
           <caret line="41" column="55" lean-forward="true" selection-start-line="41" selection-start-column="55" selection-end-line="41" selection-end-column="55" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -867,7 +835,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="5" column="89" lean-forward="false" selection-start-line="5" selection-start-column="89" selection-end-line="5" selection-end-column="89" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -875,7 +842,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="5" column="75" lean-forward="false" selection-start-line="5" selection-start-column="75" selection-end-line="5" selection-end-column="75" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -883,7 +849,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="8" column="17" lean-forward="false" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -891,7 +856,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="8" column="17" lean-forward="false" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -899,7 +863,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="5" column="17" lean-forward="false" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -907,7 +870,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="10" column="17" lean-forward="false" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -915,7 +877,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="24" column="51" lean-forward="false" selection-start-line="24" selection-start-column="51" selection-end-line="24" selection-end-column="51" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -923,7 +884,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
           <caret line="38" column="20" lean-forward="false" selection-start-line="38" selection-start-column="20" selection-end-line="38" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1066,22 +1026,10 @@
         <state relative-caret-position="388">
           <caret line="63" column="39" lean-forward="false" selection-start-line="63" selection-start-column="39" selection-end-line="63" selection-end-column="39" />
           <folding>
-            <element signature="e#835#836#0" expanded="true" />
-            <element signature="e#882#883#0" expanded="true" />
-            <element signature="e#1380#1381#0" expanded="true" />
-            <element signature="e#1407#1408#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/entity/Theme.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding>
-            <element signature="e#2761#2762#0" expanded="true" />
-            <element signature="e#2814#2815#0" expanded="true" />
-            <marker date="1525012513789" expanded="true" signature="2073:2263" ph="..." />
+            <element signature="e#835#836#0" expanded="false" />
+            <element signature="e#882#883#0" expanded="false" />
+            <element signature="e#1380#1381#0" expanded="false" />
+            <element signature="e#1407#1408#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1112,21 +1060,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="52" lean-forward="false" selection-start-line="18" selection-start-column="52" selection-end-line="18" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/entity/User.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="353">
           <caret line="70" column="42" lean-forward="false" selection-start-line="70" selection-start-column="20" selection-end-line="70" selection-end-column="42" />
           <folding>
-            <element signature="e#2191#2192#0" expanded="true" />
-            <element signature="e#2220#2221#0" expanded="true" />
+            <element signature="e#2191#2192#0" expanded="false" />
+            <element signature="e#2220#2221#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1150,21 +1090,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/app/DataGeneration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="133" column="0" lean-forward="true" selection-start-line="133" selection-start-column="0" selection-end-line="144" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/app/security/SecurityUtils.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
           <caret line="44" column="41" lean-forward="true" selection-start-line="44" selection-start-column="41" selection-end-line="44" selection-end-column="41" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1172,7 +1101,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
           <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1180,7 +1108,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="20" column="24" lean-forward="true" selection-start-line="20" selection-start-column="24" selection-end-line="22" selection-end-column="23" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1192,17 +1119,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="262">
+          <caret line="124" column="59" lean-forward="false" selection-start-line="124" selection-start-column="59" selection-end-line="124" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/webapp/frontend/templates/ThemeView.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="275" column="142" lean-forward="false" selection-start-line="275" selection-start-column="142" selection-end-line="275" selection-end-column="142" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/service/DisciplineService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="102" column="94" lean-forward="false" selection-start-line="102" selection-start-column="94" selection-end-line="102" selection-end-column="94" />
+        <state relative-caret-position="594">
+          <caret line="264" column="40" lean-forward="false" selection-start-line="264" selection-start-column="40" selection-end-line="264" selection-end-column="40" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#string_between_date#0;class#DisciplineService#0" expanded="false" />
             <element signature="method#trueRussianDecline#0;class#DisciplineService#0" expanded="false" />
+            <element signature="method#detachThemeToPersionInCoursework#0;class#DisciplineService#0" expanded="false" />
+            <element signature="method#addAttachThemeToPersonInCoursework#0;class#DisciplineService#0" expanded="false" />
+            <element signature="method#getFreeThemeListFromCoursework#0;class#DisciplineService#0" expanded="false" />
             <element signature="method#getCourseWorkInfoList#0;class#DisciplineService#0" expanded="false" />
-            <element signature="method#getThemeItemInfoList#0;class#DisciplineService#0" expanded="false" />
-            <element signature="e#13030#13049#0" expanded="true" />
             <element signature="method#isPersonAttachToThemeInCoursework#0;class#DisciplineService#0" expanded="false" />
             <element signature="method#getDisciplineInfoList#0;class#DisciplineService#0" expanded="false" />
             <element signature="method#attachGroup#0;class#DisciplineService#0" expanded="false" />
@@ -1213,25 +1157,49 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/ThemeView.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/entity/Theme.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="46" column="43" lean-forward="false" selection-start-line="46" selection-start-column="43" selection-end-line="46" selection-end-column="43" />
+        <state relative-caret-position="-413">
+          <caret line="51" column="37" lean-forward="false" selection-start-line="51" selection-start-column="37" selection-end-line="51" selection-end-column="37" />
           <folding>
-            <element signature="e#1114#1115#0" expanded="true" />
-            <element signature="e#1172#1173#0" expanded="true" />
-            <element signature="class#AdditionalCourseWorkInfo#0;class#ThemeView#0" expanded="false" />
-            <element signature="class#ThemeItemInfo#0;class#ThemeView#0" expanded="false" />
-            <element signature="e#4667#4668#0" expanded="true" />
-            <element signature="e#4719#4720#0" expanded="true" />
+            <marker date="1525084792620" expanded="true" signature="2530:2720" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/frontend/templates/ThemeView.html">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/ui/pages/ThemeView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" column="45" lean-forward="false" selection-start-line="1" selection-start-column="45" selection-end-line="1" selection-end-column="45" />
+        <state relative-caret-position="248">
+          <caret line="256" column="27" lean-forward="false" selection-start-line="256" selection-start-column="27" selection-end-line="257" selection-end-column="115" />
+          <folding>
+            <element signature="class#AdditionalCourseWorkInfo#0;class#ThemeView#0" expanded="false" />
+            <element signature="class#ThemeItemInfo#0;class#ThemeView#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/ui/components/AppNavigation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="65" column="16" lean-forward="false" selection-start-line="65" selection-start-column="16" selection-end-line="65" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/twobomb/app/DataGeneration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1603">
+          <caret line="146" column="38" lean-forward="false" selection-start-line="146" selection-start-column="38" selection-end-line="146" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="45" lean-forward="true" selection-start-line="4" selection-start-column="45" selection-end-line="4" selection-end-column="45" />
           <folding />
         </state>
       </provider>

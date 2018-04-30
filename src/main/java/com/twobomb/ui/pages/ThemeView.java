@@ -6,11 +6,13 @@ import com.twobomb.ui.MainView;
 import com.vaadin.flow.component.EventData;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.polymertemplate.EventHandler;
 import com.vaadin.flow.component.polymertemplate.ModelItem;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.templatemodel.TemplateModel;
+import com.vaadin.ui.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -43,6 +45,18 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
             disciplineService.addAttachThemeToPersonInCoursework(indexCoursework.intValue(),Integer.valueOf(index));
         } catch (Exception e) {
             getModel().setError(e.getMessage());
+            Notification.show(e.getMessage(), 5000, Notification.Position.BOTTOM_START);
+        }
+        setParameter(null,indexCoursework+1);
+
+    }
+    @EventHandler
+    public void detachMe( @EventData("event.indexDetachTheme") String index){
+        try {
+            disciplineService.detachThemeToPersionInCoursework(indexCoursework.intValue(),Integer.valueOf(index));
+        } catch (Exception e) {
+            getModel().setError(e.getMessage());
+            Notification.show(e.getMessage(), 5000, Notification.Position.BOTTOM_START);
         }
         setParameter(null,indexCoursework+1);
 
@@ -240,11 +254,16 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
     }
     @Override
     public void setParameter(BeforeEvent beforeEvent,@OptionalParameter Long aLong) {
-        aLong = aLong == null?-1:(aLong-1);
-        indexCoursework = aLong;
-        List<ThemeItemInfo> themeItemInfos = disciplineService.getThemeItemInfoList(aLong);
+        if(aLong == null) {
+            Notification.show("Выберите курсовую чтобы просмотреть темы",4000, Notification.Position.BOTTOM_START);
+            com.vaadin.flow.component.UI.getCurrent().getPage().executeJavaScript("location.assign('"+AppConst.PAGE_COURSEWORKS+"')");
+        }else {
+            aLong = aLong == null ? -1 : (aLong - 1);
+            indexCoursework = aLong;
+            List<ThemeItemInfo> themeItemInfos = disciplineService.getThemeItemInfoList(aLong);
 
-        getModel().setAdditionalCourseWorkInfo(disciplineService.getAdditionalCourseWorkInfo(aLong));
-        getModel().setThemeItemInfo(themeItemInfos);
+            getModel().setAdditionalCourseWorkInfo(disciplineService.getAdditionalCourseWorkInfo(aLong));
+            getModel().setThemeItemInfo(themeItemInfos);
+        }
     }
 }

@@ -78,6 +78,46 @@ public class DisciplineService {
         return "";
     }
 
+    public void detachThemeToPersionInCoursework(Integer indexCoursework, Integer indexTheme) throws Exception{
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+        List<CourseWork> courseworksList = new ArrayList<>();
+        disciplineList.forEach( discipline -> courseworksList.addAll(discipline.getCourseWork()));
+        CourseWork currentCoursework;
+        if(indexCoursework >= 0 && indexCoursework < courseworksList.size())
+            currentCoursework = courseworksList.get(indexCoursework);
+        else
+            throw new Exception("Незвестный индекс курсовой");
+        List<Theme> themes = currentCoursework.getThemes();
+        Theme currentTheme;
+        if(indexTheme >= 0 && indexTheme < themes.size())
+            currentTheme = themes.get(indexTheme);
+        else
+            throw new Exception("Неизвестный индекс темы!");
+        Map<CourseWork,Person> affixStud = currentTheme.getCoueseworkWidthAffixedStudents();
+        boolean isAffix = false;
+        for(CourseWork cw:affixStud.keySet())
+            if(cw.equals(currentCoursework) && affixStud.get(cw).equals(currentUser.getPerson())){
+                isAffix = true;
+                break;
+            }
+        if(!isAffix)
+            throw new Exception("Вы не прикреплены к данной теме");
+
+        ControlDiscipline controlDiscipline = currentCoursework.getDiscipline().getControl_discipline();
+        Date now = Calendar.getInstance().getTime();
+        if(controlDiscipline == null ||
+                controlDiscipline.getDateBegin().after(now) ||
+                controlDiscipline.getDateEnd().before(now))
+            throw new Exception("Смотрите дату начала и конца подачи тем!");
+        boolean isStudentChange = AppConst.DEFAULT_IS_STUDENT_CHANGE;
+        if(controlDiscipline != null)
+            isStudentChange = controlDiscipline.getIs_student_change();
+        if(!isStudentChange)
+            throw new Exception("Вы не можете открепится от выбранной темы так как это запрещено установками дисциплины!");
+        currentTheme.detachThemeFromCourseworkWithStudent(currentCoursework,currentUser.getPerson());
+    }
+
     public void addAttachThemeToPersonInCoursework(Integer indexCoursework, Integer indexTheme) throws Exception {
         User currentUser = ctx.getBean("CurrentUser",User.class);
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
@@ -97,6 +137,13 @@ public class DisciplineService {
         List<Theme> freeThemes = getFreeThemeListFromCoursework(currentCoursework,currentUser.getPerson().getGroup());
         if(!freeThemes.contains(currentTheme))
             throw new Exception("К данной теме уже прикреплен студент!");
+        ControlDiscipline controlDiscipline = currentCoursework.getDiscipline().getControl_discipline();
+        Date now = Calendar.getInstance().getTime();
+        if(controlDiscipline == null ||
+                controlDiscipline.getDateBegin().after(now) ||
+                controlDiscipline.getDateEnd().before(now))
+            throw new Exception("Смотрите дату начала и конца подачи тем!");
+
         List<Theme> affix = currentUser.getPerson().getAffixThemesStudent();
         for(Theme t:affix)
             if(t.getCourseWorks().contains(currentCoursework))
@@ -215,7 +262,7 @@ public class DisciplineService {
 
             String endDate = "";
             if(controlDiscipline.getDateEnd().before(now))
-                endDate  += "закончится ";
+                endDate  += "закончилось ";
                 else
                 endDate += " через ";
             endDate  += string_between_date(now,controlDiscipline.getDateEnd())+" ";
@@ -304,6 +351,11 @@ public class DisciplineService {
                 themeItemInfo.setIsDisabledAttachBtn(false);
                 themeItemInfo.setIsDisabledDetachBtn(false);
             }
+            boolean isStudentChange = AppConst.DEFAULT_IS_STUDENT_CHANGE;
+            if(controlDiscipline != null)
+                isStudentChange = controlDiscipline.getIs_student_change();
+            if(!isStudentChange)
+                themeItemInfo.setIsDisabledDetachBtn(true);
             themeItemInfoList.add(themeItemInfo);
         }
         return themeItemInfoList;

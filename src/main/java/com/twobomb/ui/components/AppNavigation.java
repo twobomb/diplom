@@ -8,6 +8,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.IronIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.tabs.Tab;
@@ -61,8 +62,11 @@ public class AppNavigation extends PolymerTemplate<AppNavigation.Model> implemen
 		int idx = tabs.getSelectedIndex();
 		if (idx >= 0 && idx < hrefs.size()) {
 			String href = hrefs.get(idx);
-
-			if (href.equals(logoutHref)) {
+			if(indexSegment == null || indexSegment == "" && href.equals(AppConst.PAGE_THEMES)) {
+				Notification.show("Выберите курсовую чтобы просмотреть темы",4000, Notification.Position.BOTTOM_START);
+				UI.getCurrent().navigate(AppConst.PAGE_COURSEWORKS);
+			}
+			else if (href.equals(logoutHref)) {
 				// The logout button is a 'normal' URL, not Flow-managed but
 				// handled by Spring Security.
 				UI.getCurrent().getPage().executeJavaScript("location.assign('logout')");

@@ -4,6 +4,8 @@
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
+<link rel="import" href="../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../bower_components/vaadin-notification/vaadin-notification.html">
 <dom-module id="theme-view">
     <template >
         <style>
@@ -156,10 +158,10 @@
         }
         vaadin-list-box>vaadin-item{
         cursor:pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+        /*-webkit-user-select: none;*/
+        /*-moz-user-select: none;*/
+        /*-ms-user-select: none;*/
+        /*user-select: none;*/
         transition: .5s;
         padding: 20px;
         display: flex;
@@ -234,6 +236,10 @@
         vaadin-item .themeName{
             font-size: 1.3em;
         }
+        vaadin-item .attachBlock paper-tooltip{
+            --paper-tooltip-text-color:var(--lumo-error-color);
+            --paper-tooltip-background:var(--lumo-tint-90pct);
+        }
         @media (min-width:768px) {
             vaadin-item .attachBlock{
                 min-width: 280px;
@@ -256,10 +262,22 @@
                     </div>
                     <div class="attachBlock col">
                         <template  is="dom-if" if="{{item.isCanAttach}}">
-                            <vaadin-button on-click="attachMe" {{item.isDisabledAttachBtn}} data-index$="{{item.index}}" class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                            <template  is="dom-if" if="{{item.isDisabledAttachBtn}}">
+                                    <vaadin-button on-click="attachMe"   disabled class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                                    <paper-tooltip offset="0">Смотрите дату начала и конца подачи тем</paper-tooltip>
+                            </template>
+                            <template  is="dom-if" if="{{!item.isDisabledAttachBtn}}">
+                                <vaadin-button on-click="attachMe"  data-index$="{{item.index}}" class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                            </template>
                         </template>
                         <template  is="dom-if" if="{{item.isCurrentUserAttach}}">
-                            <vaadin-button {{item.isDisabledDetachBtn}} class="deatachTheme"><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
+                            <template  is="dom-if" if="{{item.isDisabledDetachBtn}}">
+                                <vaadin-button disabled class="deatachTheme" ><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
+                                <paper-tooltip offset="0">Смотрите дату начала и конца подачи тем и дополнительные установки данной дисциплины.</paper-tooltip>
+                            </template>
+                            <template  is="dom-if" if="{{!item.isDisabledDetachBtn}}">
+                                <vaadin-button on-click="detachMe" data-index$="{{item.index}}" class="deatachTheme"><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
+                            </template>
                         </template>
                         <div class="themeAttachedInfo"><iron-icon icon="vaadin:vaadin:info-circle"></iron-icon>{{item.status}}</div>
                         <div class="themeAttachedTeacher"><iron-icon icon="vaadin:vaadin:nurse"></iron-icon>Преподаватель {{item.teacherAdd}}</div>
@@ -290,8 +308,12 @@
             }
             attachMe(event){
                 var index = event.srcElement.getAttribute("data-index") -1;
-                this.notifyPath("indexAttachTheme",index);
                 event.indexAttachTheme = index;
+            }
+            detachMe(event){
+                var index = event.srcElement.getAttribute("data-index") -1;
+//                this.notifyPath("indexAttachTheme",index);
+                event.indexDetachTheme = index;
             }
             _formatDescription(txt){
                 return txt;
@@ -322,8 +344,6 @@
                         themeItemInfo:{
                           observer(){
                               this.themeItemInfo.map(function (e) {
-                                  e.isDisabledAttachBtn = e.isDisabledAttachBtn?" disabled ":"";
-                                  e.isDisabledDetachBtn = e.isDisabledDetachBtn?" disabled ":"";
                                   //e.edited = Math.random() < .3?"Отредактироал вася пупкин":null;//test
                                   e.isEditedNull = e.edited == null || e.edited == "";
                               });
@@ -331,7 +351,7 @@
                         },
                         error:{
                             observer(){
-                             alert(this.error);
+                                //erorr handler
                             }
                         },
                         dateBeginIsBefore:{

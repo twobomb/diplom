@@ -78,6 +78,15 @@ public class Theme extends AbstractEntity{
     List<CourseWork> courseWorks;
 
 
+    //Открпить студента от темы
+        public void detachThemeFromCourseworkWithStudent(CourseWork coursework,Person student){
+            Map<CourseWork,Person> affixStud = getCoueseworkWidthAffixedStudents();
+            for(CourseWork cw:affixStud.keySet())
+                if(cw.equals(coursework) && affixStud.get(cw).equals(student)){
+                    affixStud.remove(cw,affixStud.get(cw));
+                    break;
+                }
+        }
 //    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 //    @JoinTable(name = "student_bind_theme_in_coursework",
 //            joinColumns = @JoinColumn(name = "id_theme"),

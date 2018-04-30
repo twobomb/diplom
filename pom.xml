@@ -123,6 +123,11 @@
         <!-- End of Vaadin -->
 
         <!-- Iron and paper, and other polymer elements -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.polymerelements</groupId>
+            <artifactId>paper-tooltip</artifactId>
+            <version>2.1.1</version>
+        </dependency>
 
         <dependency>
             <groupId>org.vaadin.icons</groupId>
