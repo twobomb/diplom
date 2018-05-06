@@ -20,7 +20,15 @@ public class Role extends AbstractEntity{
 
     public Role() {
     }
-
+    public boolean isAdmin(){
+        return role.equals(ADMIN);
+    }
+    public boolean isStudent(){
+        return role.equals(STUDENT);
+    }
+    public boolean isTeacher(){
+        return role.equals(TEACHER);
+    }
 
     @OneToMany(mappedBy = "role",fetch = FetchType.EAGER,cascade = CascadeType.REFRESH)
     private List<User> users;

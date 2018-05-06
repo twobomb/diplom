@@ -37,8 +37,13 @@ public class AppNavigation extends PolymerTemplate<AppNavigation.Model> implemen
 	private String defaultHref;
 	private String currentHref;
 	private String indexSegment;
-	@Autowired
+
 	User currentUser;
+	@Autowired
+	public AppNavigation(User currentUser) {
+		this.currentUser = currentUser;
+	}
+
 
 	public void init(List<PageInfo> pages, String defaultHref, String logoutHref) {
 		getModel().setUsername(currentUser.getPerson().getLastname()+" "+currentUser.getPerson().getFirstname());

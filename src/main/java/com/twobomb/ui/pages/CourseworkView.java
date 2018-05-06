@@ -4,6 +4,9 @@ import com.twobomb.Utils.AppConst;
 import com.twobomb.entity.User;
 import com.twobomb.service.DisciplineService;
 import com.twobomb.ui.MainView;
+import com.twobomb.ui.components.BreadCrumbs;
+import com.twobomb.ui.datacontainers.UserData;
+import com.twobomb.ui.models.MainModel;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
@@ -18,7 +21,7 @@ import java.util.List;
 @Route(value = AppConst.PAGE_COURSEWORKS,layout = MainView.class)
 //@RouteAlias(value = AppConst.PAGE_DISCIPLINES, layout = MainView.class)
 @PageTitle(AppConst.TITLE_COURSEWORK)
-public class CourseworkView extends PolymerTemplate<CourseworkView.Model> implements HasUrlParameter<Long> {
+public class CourseworkView extends PolymerTemplate<CourseworkView.Model> implements HasUrlParameter<String> {
 
 
     DisciplineService disciplineService;
@@ -28,17 +31,21 @@ public class CourseworkView extends PolymerTemplate<CourseworkView.Model> implem
     public CourseworkView(DisciplineService disciplineService,User currentUser) {
         this.disciplineService = disciplineService;
         getModel().setThemePage(AppConst.PAGE_THEMES);
+        getModel().setUserData(UserData.getInstance(currentUser));
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter Long aLong) {
+    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String str) {
+        Long aLong = null;
+        if(str != null)
+            aLong = Long.valueOf(BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.DISCIPLINE));
         List<CourseWorkInfo> res = disciplineService.getCourseWorkInfoList(aLong == null?-1:  (aLong-1));
         Model model = getModel();
 
         model.setCourseworkInfo(res);
     }
 
-    public interface Model extends TemplateModel {
+    public interface Model extends MainModel {
          void setCourseworkInfo(List<CourseWorkInfo> d);
          void setThemePage(String d);
     }
@@ -50,6 +57,8 @@ public class CourseworkView extends PolymerTemplate<CourseworkView.Model> implem
         private String prepodList;
         private String dateBegin;
         private String dateEnd;
+
+        //Для студента выбрана ли тема, для препода все ли темы добавлен
         private Boolean isThemeChecked;
         private Integer indexOfMainList;
         public CourseWorkInfo() {

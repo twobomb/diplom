@@ -42,6 +42,16 @@ public class Group extends AbstractEntity {
     public Group() {
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Group){
+            Group g = (Group)obj;
+            return g.id == id;
+        }
+        else
+            return false;
+    }
+
     public Integer getCourse() {
         return course;
     }

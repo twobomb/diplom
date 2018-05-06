@@ -1,8 +1,12 @@
 package com.twobomb.ui.pages;
 
 import com.twobomb.Utils.AppConst;
+import com.twobomb.entity.User;
 import com.twobomb.service.DisciplineService;
 import com.twobomb.ui.MainView;
+import com.twobomb.ui.components.BreadCrumbs;
+import com.twobomb.ui.datacontainers.UserData;
+import com.twobomb.ui.models.MainModel;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.listbox.ListBox;
@@ -10,8 +14,10 @@ import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.templatemodel.TemplateModel;
+import com.vaadin.ui.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag("disciplines-view")
@@ -22,24 +28,26 @@ import java.util.List;
 
 public class DisciplinesView extends PolymerTemplate<DisciplinesView.Model>{
 
-    @Id("listDisciplines")
-    ListBox<String> listBox;
-
 
 
     @Autowired
-    public DisciplinesView(DisciplineService disciplineService) {
+    public DisciplinesView(DisciplineService disciplineService,User currentUser) {
+
             List<DisciplineInfo> data = disciplineService.getDisciplineInfoList();
             Model m = getModel();
             m.setDisciplineInfo(data);
             m.setCourseworkPage(AppConst.PAGE_COURSEWORKS);
+            m.setUserData(UserData.getInstance(currentUser));
     }
+
 
     public static class DisciplineInfo{
 
         private Integer index;
         private Integer courseworkCount;
         private String disciplineName;
+
+        //Для стуеднта выбраны ли темы, для учителя добавлены ли все темы
         private Boolean isChecked;
 
         public DisciplineInfo() {
@@ -80,7 +88,7 @@ public class DisciplinesView extends PolymerTemplate<DisciplinesView.Model>{
         }
 
     }
-    public interface Model extends TemplateModel {
+    public interface Model extends MainModel {
             void setDisciplineInfo(List<DisciplineInfo> d);
             void setCourseworkPage(String d);
     }

@@ -7,7 +7,9 @@ import com.twobomb.repository.GroupRepository;
 import com.twobomb.repository.PersonRepository;
 import com.twobomb.ui.pages.CourseworkView;
 import com.twobomb.ui.pages.DisciplinesView;
+import com.twobomb.ui.pages.GroupView;
 import com.twobomb.ui.pages.ThemeView;
+import com.vaadin.flow.component.notification.Notification;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,9 +19,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
-import java.time.Period;
 import java.util.*;
 
 @SuppressWarnings("Duplicates")
@@ -27,6 +29,8 @@ import java.util.*;
 @Repository
 @Transactional
 public class DisciplineService {
+
+    //region Автовайреды
     @Autowired
     DiscinplineRepository discinplineRepository;
 
@@ -41,6 +45,9 @@ public class DisciplineService {
 
     @Autowired
     ApplicationContext ctx;
+    //endregion
+
+    //region Возвращает дату между датами , словами
     public static String string_between_date(Date d1, Date d2){
         long date1 = d1.getTime();
         long date2 = d2.getTime();
@@ -63,7 +70,10 @@ public class DisciplineService {
         if(date1 > date2)
             res+=" назад";
         return res;
-    }                                 //example d1 дней       d2  день        d3 дня
+    }
+    //endregion
+
+    //region Правильные окончания чисел, {example512 d1=дней       d2 =день        d3=дня  c=4 return дня}
     public static String trueRussianDecline(String d1, String d2, String d3, int c){
         String res = "";
         switch (c%100){
@@ -77,7 +87,9 @@ public class DisciplineService {
         }
         return "";
     }
+    //endregion
 
+    //region Отвязать текущего студента от темы в курсовой работе
     public void detachThemeToPersionInCoursework(Integer indexCoursework, Integer indexTheme) throws Exception{
         User currentUser = ctx.getBean("CurrentUser",User.class);
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
@@ -117,7 +129,9 @@ public class DisciplineService {
             throw new Exception("Вы не можете открепится от выбранной темы так как это запрещено установками дисциплины!");
         currentTheme.detachThemeFromCourseworkWithStudent(currentCoursework,currentUser.getPerson());
     }
+    //endregion
 
+    //region Привязать тему и курсовую  к текущей персоне
     public void addAttachThemeToPersonInCoursework(Integer indexCoursework, Integer indexTheme) throws Exception {
         User currentUser = ctx.getBean("CurrentUser",User.class);
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
@@ -152,7 +166,9 @@ public class DisciplineService {
 
 
     }
-    //Вернуть темы данной курсовой работы к которым никто не привязан из данной группы
+    //endregion
+
+    //region Вернуть темы данной курсовой работы к которым никто не привязан из данной группы
     public List<Theme> getFreeThemeListFromCoursework(CourseWork cw,Group group){
         List<Theme> freeThemes = new ArrayList<>();
         List<Person> studentsInGroup = group.getPersons();
@@ -170,6 +186,9 @@ public class DisciplineService {
         }
         return freeThemes;
     }
+    //endregion
+
+    //region Получить лист информации о курсовых для текущего юзера
     public List<CourseworkView.CourseWorkInfo> getCourseWorkInfoList(Long disId){
         User currentUser = ctx.getBean("CurrentUser",User.class);
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
@@ -206,20 +225,131 @@ public class DisciplineService {
             if(control != null && control.getDateEnd() != null)
                 end = new SimpleDateFormat("dd.MM.yyyy").format(control.getDateEnd());
             courseWorkInfo.setDateEnd(end);
-            boolean isCheked = false;
-            List<Theme> themeList = currentUser.getPerson().getAffixThemesStudent();
-            for(Theme theme:themeList)
-                if(theme.getCourseWorks().contains(cw)){
-                    isCheked = true;
-                    break;
-                }
-            courseWorkInfo.setIsThemeChecked(isCheked);
+            boolean isChecked = false;
+            if(currentUser.getRole().isStudent()) {
+                List<Theme> themeList = currentUser.getPerson().getAffixThemesStudent();
+                for (Theme theme : themeList)
+                    if (theme.getCourseWorks().contains(cw)) {
+                        isChecked = true;
+                        break;
+                    }
+            }else if(currentUser.getRole().isTeacher()){
+                    isChecked = true;
+                //Проверка количество добавленных тем соответствует необходимому кол-ву
+                    List<TeacherInfo> ti =cw.getTeacherInfos();
+                    ti.removeIf(teacherInfo -> !teacherInfo.getPerson().equals(currentUser.getPerson()));
+                    if(ti.size() == 0) {
+                        Notification.show("Отсутствует  информация о необходимом количестве тем в курсовой работе '"+cw.getName()+"'",8000, Notification.Position.BOTTOM_START);
+                        isChecked = false;
+                    }else {
+                        List<Theme> themes = cw.getThemes();
+                        int countAddTheme = 0;
+                        for (Theme theme : themes)
+                            if (theme.getAdd_person().equals(currentUser.getPerson()))
+                                countAddTheme++;
+                        if (ti.get(0).getCount_theme() > countAddTheme) {
+                            isChecked = false;
+                        }
+                    }
+
+            }
+            courseWorkInfo.setIsThemeChecked(isChecked);
             courseWorkInfos.add(courseWorkInfo);
 
         }
 
         return courseWorkInfos;
     }
+    //endregion
+
+    //region Получить лист информации о группах для текущего юзера
+    public List<GroupView.GroupInfo> getListGroupInfo(){
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        Role role = currentUser.getRole();
+        List<GroupView.GroupInfo> groupInfoList = new ArrayList<>();
+
+        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+        List<Group> groups = new ArrayList<>();
+
+        disciplineList.forEach( (discipline) -> {
+            discipline.getGroups().forEach((group)->{
+               if(!groups.contains(group))
+                    groups.add(group);
+            });
+        });
+
+        int index = 1;
+        for (Group group:groups){
+            GroupView.GroupInfo groupInfo = new GroupView.GroupInfo();
+            groupInfo.setIndex(index++);
+            groupInfo.setCourse(group.getCourse());
+            groupInfo.setGroupName(group.getName());
+            int countStud = group.getPersons().size();
+            groupInfo.setStudentCount(countStud+ " " + trueRussianDecline("студентов","студент","студента",countStud));
+            List<CourseWork> courseWorks = getListCourseworkFromGroupAttachedToTeacher(group,currentUser.getPerson());
+            groupInfo.setCountCoursework(courseWorks.size());
+            int countDisc = getListDisciplineFromGroupAttachedToTeacher(group,currentUser.getPerson()).size();
+            groupInfo.setCountDiscipline(countDisc + " " + trueRussianDecline("ваших","ваша","ваши",countDisc) + " "+ trueRussianDecline("дисциплин","дисциплина","дисциплины",countDisc));
+            groupInfo.setIsCheck(true);
+            if(role.isTeacher())
+                for (CourseWork cw:courseWorks)
+                    if(!isAllNeededThemesAddedToCourseWorkByTeacher(cw,currentUser.getPerson())){
+                        groupInfo.setIsCheck(false);
+                        break;
+                    }
+            groupInfo.setLinkShowCourseworks(AppConst.PAGE_COURSEWORKS+"/group-"+index);
+            groupInfo.setLinkShowDisciplines(AppConst.PAGE_DISCIPLINES+"/group-"+index);
+            groupInfoList.add(groupInfo);
+        }
+        return groupInfoList;
+    }
+    //endregion
+
+    //region Все ли темы добавил преподаватель к курсовой, количество должно быть равно или больше необходимому
+    public boolean isAllNeededThemesAddedToCourseWorkByTeacher(CourseWork cw,Person teacher){
+        boolean isChecked = true;
+        List<TeacherInfo> ti =cw.getTeacherInfos();
+        ti.removeIf(teacherInfo -> !teacherInfo.getPerson().equals(teacher));
+        if(ti.size() == 0) {
+            Notification.show("Отсутствует  информация о необходимом количестве тем в курсовой работе '"+cw.getName()+"'",8000, Notification.Position.BOTTOM_START);
+            isChecked = false;
+        }else {
+            List<Theme> themes = cw.getThemes();
+            int countAddTheme = 0;
+            for (Theme theme : themes)
+                if (theme.getAdd_person().equals(teacher))
+                    countAddTheme++;
+            if (ti.get(0).getCount_theme() > countAddTheme) {
+                isChecked = false;
+            }
+        }
+        return isChecked;
+    }
+    //endregion
+
+    //region Получить лист дисциплин группы n привязанных к преподавателю n
+    public List<CourseWork> getListCourseworkFromGroupAttachedToTeacher(Group group,Person person){
+        List<CourseWork> courseWorks = new ArrayList<>();
+        group.getDisciplines().forEach((discipline)->{
+            if(discipline.getAttachedTeachers().contains(person) || person.getUser().getRole().isAdmin())
+                courseWorks.addAll(discipline.getCourseWork());
+        });
+        return courseWorks;
+    }
+    //endregion
+
+    //region Получить лист курсовых группы n привязанных к преподавателю n
+    public List<Discipline> getListDisciplineFromGroupAttachedToTeacher(Group group,Person person){
+        List<Discipline> disciplineList = new ArrayList<>();
+        group.getDisciplines().forEach((discipline)->{
+            if(discipline.getAttachedTeachers().contains(person) || person.getUser().getRole().isAdmin())
+                disciplineList.add(discipline);
+        });
+        return disciplineList;
+    }
+    //endregion
+
+    //region Получить дополнительную инфу о курсовой n
     public ThemeView.AdditionalCourseWorkInfo getAdditionalCourseWorkInfo(Long indexCoursework){
         User currentUser = ctx.getBean("CurrentUser",User.class);
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
@@ -233,6 +363,7 @@ public class DisciplineService {
             return null;
 
         ThemeView.AdditionalCourseWorkInfo info = new ThemeView.AdditionalCourseWorkInfo();
+
         info.setGroupName(currentUser.getPerson().getGroup().getName());
         info.setCourseworkName(currentCoursework.getName());
         info.setDisciplineName(currentCoursework.getDiscipline().getName());
@@ -285,6 +416,9 @@ public class DisciplineService {
         return info;
 
     }
+    //endregion
+
+    //region Получить лист информации о темах в курсовой n
     public List<ThemeView.ThemeItemInfo> getThemeItemInfoList(Long indexCoursework){
         User currentUser = ctx.getBean("CurrentUser",User.class);
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
@@ -360,6 +494,9 @@ public class DisciplineService {
         }
         return themeItemInfoList;
     }
+    //endregion
+
+    //region Персона p привязана к курсовой c?
     public boolean isPersonAttachToThemeInCoursework(Person p, CourseWork c){
         for(Theme t:c.getThemes())
             if(t.getCoueseworkWidthAffixedStudents().get(c) != null)
@@ -367,9 +504,15 @@ public class DisciplineService {
                     return true;
         return false;
     }
+    //endregion
+
+    //region Тема t привязана к курсовой c?
     public boolean isAttachedThemeToCoursework(Theme t,CourseWork c){
         return c.getThemes().contains(t);
     }
+    //endregion
+
+    //region Получить лист информации о дисциплинах для текущего юзера
     public List<DisciplinesView.DisciplineInfo> getDisciplineInfoList(){
         User currentUser = ctx.getBean("CurrentUser",User.class);
         Person person = currentUser.getPerson();
@@ -388,20 +531,44 @@ public class DisciplineService {
             //Привязанные темы студента
             List<Theme> themeAffix = person.getAffixThemesStudent();
 
-            //Проверка во всех ли курсовых данного предмета есть привязанная тема данного студента
             Boolean isCheckedTmp = true;
+            if(currentUser.getRole().isStudent()) {
+                //Проверка во всех ли курсовых данного предмета есть привязанная тема данного студента
                 for (CourseWork cw : courseWorks) {
                     List<Theme> cwThemes = cw.getThemes();
-                boolean flag = false;
-                for (Theme studTheme : themeAffix) {
-                    if (cwThemes.contains(studTheme)) {
-                        flag = true;
+                    boolean flag = false;
+                    for (Theme studTheme : themeAffix) {
+                        if (cwThemes.contains(studTheme)) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (!flag) {
+                        isCheckedTmp = false;
                         break;
                     }
                 }
-                if (!flag) {
-                    isCheckedTmp = false;
-                    break;
+            }
+            else if(currentUser.getRole().isTeacher()){
+                //Проверка количество добавленных тем соответствует необходимому кол-ву
+                List<CourseWork> cwList = l.getCourseWork();
+                for(CourseWork cw:cwList){
+                    List<TeacherInfo> ti =cw.getTeacherInfos();
+                    ti.removeIf(teacherInfo -> !teacherInfo.getPerson().equals(currentUser.getPerson()));
+                    if(ti.size() == 0) {
+                        Notification.show("Отсутствует  информация о необходимом количестве тем в курсовой работе '"+cw.getName()+"'",8000, Notification.Position.BOTTOM_START);
+                        isCheckedTmp = false;
+                        break;
+                    }
+                    List<Theme> themes =  cw.getThemes();
+                    int countAddTheme = 0;
+                    for(Theme theme:themes)
+                        if(theme.getAdd_person().equals(currentUser.getPerson()))
+                            countAddTheme++;
+                    if(ti.get(0).getCount_theme() > countAddTheme ){
+                        isCheckedTmp = false;
+                        break;
+                    }
                 }
             }
             disciplineInfo.setIsChecked(isCheckedTmp);
@@ -410,6 +577,9 @@ public class DisciplineService {
 
         return disciplineInfos;
     }
+    //endregion
+
+    //region Привязать группу к дисциплине
     public void attachGroup(Group group,Discipline discipline){
         SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
         Session session = sessionFactory.getCurrentSession();
@@ -428,6 +598,9 @@ public class DisciplineService {
         group.addDiscipline(discipline);
         groupRepository.save(group);
     }
+    //endregion
+
+    //region Привязать преподавателя к дисциплине
     public void attachTeacher(Person person,Discipline discipline){
 
         SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
@@ -455,10 +628,9 @@ public class DisciplineService {
         person.addDisciplineTeacher(discipline);
         personRepository.save(person);
     }
-    public List<Discipline> getAll(){
-        return discinplineRepository.findAll();
-    }
+    //endregion
 
+    //region Получить все привязанные дисциплины к текущему юзеру
     public List<Discipline> getBindDisciplineWidthUser(User user){
 
         List<Discipline> res = new ArrayList<>();
@@ -488,7 +660,9 @@ public class DisciplineService {
         }
     return res;
     }
-    //Получить курсовые привязанные к пользователю
+    //endregion
+
+    //region Получить лист курсовых привязанных к пользователю
     public List<CourseWork> getCourseWorkWithUser(User user){
         Group group = user.getPerson().getGroup();
         List<Discipline> userDisciplines = group.getDisciplines();
@@ -497,4 +671,12 @@ public class DisciplineService {
             res.addAll(d.getCourseWork());
         return res;
     }
+    //endregion
+
+    //region Получить все дисциплины
+    public List<Discipline> getAll(){
+        return discinplineRepository.findAll();
+    }
+    //endregion
+
 }

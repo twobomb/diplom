@@ -42,6 +42,7 @@ public final class SecurityUtils {
 
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
+        if(userDetails == null)return null;
         return userDetails.getUsername();
     }
 

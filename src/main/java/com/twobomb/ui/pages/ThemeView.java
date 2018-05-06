@@ -1,8 +1,12 @@
 package com.twobomb.ui.pages;
 
 import com.twobomb.Utils.AppConst;
+import com.twobomb.entity.User;
 import com.twobomb.service.DisciplineService;
 import com.twobomb.ui.MainView;
+import com.twobomb.ui.components.BreadCrumbs;
+import com.twobomb.ui.datacontainers.UserData;
+import com.twobomb.ui.models.MainModel;
 import com.vaadin.flow.component.EventData;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.HtmlImport;
@@ -22,17 +26,20 @@ import java.util.List;
 @Route(value = AppConst.PAGE_THEMES,layout = MainView.class)
 //@RouteAlias(value = AppConst.PAGE_DISCIPLINES, layout = MainView.class)
 @PageTitle(AppConst.TITLE_THEMES)
-public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUrlParameter<Long> {
+public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUrlParameter<String> {
 
 
     DisciplineService disciplineService;
 
     Long indexCoursework;
+    String urlParametr = "";
     @Autowired
-    public ThemeView(DisciplineService disciplineService) {
+    public ThemeView(DisciplineService disciplineService,User currentUser) {
         this.disciplineService = disciplineService;
+        getModel().setUserData(UserData.getInstance(currentUser));
     }
-    public interface Model extends TemplateModel {
+
+    public interface Model extends MainModel {
         void setThemeItemInfo(List<ThemeItemInfo> d);
         void setAdditionalCourseWorkInfo(AdditionalCourseWorkInfo d);
         void setError(String s);
@@ -47,7 +54,7 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
             getModel().setError(e.getMessage());
             Notification.show(e.getMessage(), 5000, Notification.Position.BOTTOM_START);
         }
-        setParameter(null,indexCoursework+1);
+        setParameter(null,urlParametr);
 
     }
     @EventHandler
@@ -58,7 +65,7 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
             getModel().setError(e.getMessage());
             Notification.show(e.getMessage(), 5000, Notification.Position.BOTTOM_START);
         }
-        setParameter(null,indexCoursework+1);
+        setParameter(null,urlParametr);
 
     }
 
@@ -253,7 +260,13 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
 
     }
     @Override
-    public void setParameter(BeforeEvent beforeEvent,@OptionalParameter Long aLong) {
+    public void setParameter(BeforeEvent beforeEvent,@OptionalParameter String str) {
+        Long aLong = null;
+        if(str != null) {
+            aLong = Long.valueOf(BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.COURSEWORK));
+            urlParametr = str;
+        }
+
         if(aLong == null) {
             Notification.show("Выберите курсовую чтобы просмотреть темы",4000, Notification.Position.BOTTOM_START);
             com.vaadin.flow.component.UI.getCurrent().getPage().executeJavaScript("location.assign('"+AppConst.PAGE_COURSEWORKS+"')");

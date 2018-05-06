@@ -261,24 +261,34 @@
                         </iron-collapse>
                     </div>
                     <div class="attachBlock col">
-                        <template  is="dom-if" if="{{item.isCanAttach}}">
-                            <template  is="dom-if" if="{{item.isDisabledAttachBtn}}">
-                                    <vaadin-button on-click="attachMe"   disabled class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
-                                    <paper-tooltip offset="0">Смотрите дату начала и конца подачи тем</paper-tooltip>
+
+
+                        <template  is="dom-if" if="{{userData.isTeacher}}">
+                            тичер
+                        </template>
+
+                        <template  is="dom-if" if="{{userData.isStudent}}">
+                            <template  is="dom-if" if="{{item.isCanAttach}}">
+                                <template  is="dom-if" if="{{item.isDisabledAttachBtn}}">
+                                        <vaadin-button on-click="attachMe"   disabled class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                                        <paper-tooltip offset="0">Смотрите дату начала и конца подачи тем</paper-tooltip>
+                                </template>
+                                <template  is="dom-if" if="{{!item.isDisabledAttachBtn}}">
+                                    <vaadin-button on-click="attachMe"  data-index$="{{item.index}}" class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                                </template>
                             </template>
-                            <template  is="dom-if" if="{{!item.isDisabledAttachBtn}}">
-                                <vaadin-button on-click="attachMe"  data-index$="{{item.index}}" class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                            <template  is="dom-if" if="{{item.isCurrentUserAttach}}">
+                                <template  is="dom-if" if="{{item.isDisabledDetachBtn}}">
+                                    <vaadin-button disabled class="deatachTheme" ><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
+                                    <paper-tooltip offset="0">Смотрите дату начала и конца подачи тем и дополнительные установки данной дисциплины.</paper-tooltip>
+                                </template>
+                                <template  is="dom-if" if="{{!item.isDisabledDetachBtn}}">
+                                    <vaadin-button on-click="detachMe" data-index$="{{item.index}}" class="deatachTheme"><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
+                                </template>
                             </template>
                         </template>
-                        <template  is="dom-if" if="{{item.isCurrentUserAttach}}">
-                            <template  is="dom-if" if="{{item.isDisabledDetachBtn}}">
-                                <vaadin-button disabled class="deatachTheme" ><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
-                                <paper-tooltip offset="0">Смотрите дату начала и конца подачи тем и дополнительные установки данной дисциплины.</paper-tooltip>
-                            </template>
-                            <template  is="dom-if" if="{{!item.isDisabledDetachBtn}}">
-                                <vaadin-button on-click="detachMe" data-index$="{{item.index}}" class="deatachTheme"><iron-icon icon="vaadin:vaadin:minus-circle"></iron-icon>Открепится от темы</vaadin-button>
-                            </template>
-                        </template>
+
+
                         <div class="themeAttachedInfo"><iron-icon icon="vaadin:vaadin:info-circle"></iron-icon>{{item.status}}</div>
                         <div class="themeAttachedTeacher"><iron-icon icon="vaadin:vaadin:nurse"></iron-icon>Преподаватель {{item.teacherAdd}}</div>
                     </div>

@@ -1,0 +1,42 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/vaadin-button/vaadin-button.html">
+
+<dom-module id="error-page">
+    <template>
+        <style>
+            #cont #text{
+                color:var(--lumo-tint-90pct);
+                background: var(--lumo-primary-color-50pct);
+            }
+            #cont{
+                background: url("../../images/logo_blue.png") no-repeat;
+                background-size: 100% auto;
+
+                min-height: 500px;
+            }
+            vaadin-button{
+                margin: auto;
+                display: block;
+                color:var(--lumo-tint-90pct);
+            }
+        </style>
+        <div id="cont">
+            <div id="text">
+                <h3 style="text-align: center">
+                    Ошибка 404! Страница не найдена!
+                </h3>
+                <a href=""><vaadin-button >Перейти на главную страницу</vaadin-button></a>
+            </div>
+        </div>
+
+    </template>
+
+    <script>
+        class ErrorPageView extends Polymer.Element {
+            static get is() {
+                return 'error-page';
+            }
+        }
+        customElements.define(ErrorPageView.is, ErrorPageView);
+    </script>
+</dom-module>

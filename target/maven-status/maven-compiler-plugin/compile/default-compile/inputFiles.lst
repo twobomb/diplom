@@ -2,6 +2,7 @@ C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\Cu
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\ThemeRepository.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\ControlDiscipline.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\MainView.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\error\CustomRouteNotFoundError.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\PersonService.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\RoleService.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\AbstractEntity.java
@@ -17,6 +18,9 @@ C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\LoginV
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\SecurityUtils.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\app\security\HasLogger.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Person.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\error\AccessDeniedView.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\GroupView.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\components\BreadCrumbs.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\components\PageInfo.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Theme.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\ControlDisciplineRepository.java
@@ -32,10 +36,13 @@ C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Group.ja
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\Application.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\CourseworkView.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\CourseworkRepository.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\models\MainModel.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\ThemeView.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\service\ThemeService.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\datacontainers\UserData.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\Discipline.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\ThemeOffer.java
+C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\ui\pages\error\AccessDeniedException.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\RoleRepository.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\entity\TeacherInfo.java
 C:\Users\twobomb\Desktop\twobombdiplom\src\main\java\com\twobomb\repository\GroupRepository.java

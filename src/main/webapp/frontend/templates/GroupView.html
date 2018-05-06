@@ -1,0 +1,162 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-list-box/vaadin-list-box.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
+<link rel="import" href="../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../bower_components/vaadin-notification/vaadin-notification.html">
+<dom-module id="group-view">
+    <template>
+        <style>
+
+            vaadin-list-box>vaadin-item .row{
+                display: flex;
+                flex-direction: row;
+                margin-top: 10px;
+            }
+            vaadin-list-box>vaadin-item .col{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            vaadin-list-box>vaadin-item>.themeIndex{
+                font-size:1.6em;
+                margin: 0 20px;
+            }
+            vaadin-list-box>vaadin-item{
+                cursor:pointer;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                transition: .5s;
+                padding: 20px;
+                display: flex;
+                -webkit-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                -moz-box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                box-shadow: 0px 4px 9px -2px var(--lumo-shade-40pct);
+                flex-direction: row;
+                align-items: center;
+                font-family: var(--lumo-font-family);
+                position: relative;
+            }
+            .success{
+                color:var(--lumo-success-color) !important;
+            }
+            .error{
+                color:var(--lumo-error-color) !important;
+            }
+            vaadin-list-box>vaadin-item .statusBlock iron-icon{
+                height:1.2em;
+                margin-right: 5px;
+            }
+            vaadin-list-box>vaadin-item .statusBlock div:last-child{
+                border-bottom: 1px solid var(--lumo-primary-color-50pct);
+            }
+            vaadin-list-box>vaadin-item .statusBlock{
+                margin-left: auto;
+                justify-content: flex-end;
+            }
+            vaadin-list-box>vaadin-item .buttonBlock vaadin-button{
+                transition: 1s;
+                opacity: .2;
+                border:1px solid rgba(255,255,255,0);
+            }
+            vaadin-list-box>vaadin-item:hover .buttonBlock vaadin-button{
+                transition: 1s;
+                opacity: 1;
+                border:1px solid var(--lumo-primary-color);
+            }
+            vaadin-list-box>vaadin-item .buttonBlock vaadin-button:active{
+                background: var(--lumo-primary-color-50pct);
+                transition: none;
+            }
+            vaadin-list-box>vaadin-item .buttonBlock{
+                margin-left: 30px;
+            }
+            vaadin-list-box>vaadin-item .groupInfo .groupName{
+                font-size: 1.3em;
+                font-family: Century;
+            }
+            vaadin-list-box>vaadin-item .groupInfo .countStud{
+                font-size: .9em;
+                color:var(--lumo-primary-color);
+                border-bottom:1px solid var(--lumo-primary-color);
+            }
+            vaadin-list-box>vaadin-item .groupInfo .countDisc{
+                font-size: 1em;
+                color:var(--lumo-error-color);
+                border-bottom:1px solid var(--lumo-error-color);
+            }
+        </style>
+
+
+        <vaadin-list-box id="listCourseworks">
+            <template is="dom-repeat" items="{{groupInfo}}">
+                <vaadin-item on-click="handleClick">
+                    <div class="themeIndex col">{{item.index}}</div>
+                    <div class="col groupInfo">
+                        <div class="groupName row">Группа {{item.groupName}} - {{item.course}} курс</div>
+                        <div class="countStud row">В группе {{item.studentCount}}</div>
+                        <div class="countDisc row">{{item.countDiscipline}}</div>
+                    </div>
+                    <div class="col statusBlock">
+                        <template is="dom-if" if="{{userData.isTeacher}}">
+                            <template is="dom-if" if="{{item.isChecked}}">
+                                <div class="themeName row success"><iron-icon icon="vaadin:vaadin:check"></iron-icon>Все темы добавлены</div>
+                            </template>
+                            <template is="dom-if" if="{{!item.isChecked}}">
+                                <div class="themeName row error"><iron-icon icon="vaadin:vaadin:warning"></iron-icon>Необходимо добавить темы</div>
+                            </template>
+                        </template>
+                        <div class="themeName row"><iron-icon icon="vaadin:vaadin:file-text-o"></iron-icon>Курсовых {{item.countCoursework}}</div>
+                    </div>
+                    <div class="buttonBlock col">
+                            <vaadin-button>
+                                <iron-icon icon="vaadin:vaadin:list"></iron-icon>
+                                Просмотр дисциплин
+                            </vaadin-button>
+                        <vaadin-button>
+                            <iron-icon icon="vaadin:vaadin:file-text-o"></iron-icon>
+                            Просмотр курсовых
+                        </vaadin-button>
+                    </div>
+                </vaadin-item>
+            </template>
+        </vaadin-list-box>
+
+    </template>
+
+    <script>
+        function trueRussianDecline(d1, d2,d3, c){
+            switch (c%100){
+                case 11: case 12: case 13: case 14:return d1;
+                default:
+                    switch (c%10){
+                        case 0:case 5:case 6:case 7:case 8:case 9:return d1;
+                        case 1: return d2;
+                        case 2:case 3:case 4: return d3;
+                    }
+            }
+            return "";
+        }
+
+        class GroupView extends Polymer.Element {
+            static get is() {
+                return "group-view";
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+            }
+
+            static get properties() {
+                return {
+
+                }
+            }
+        }
+        window.customElements.define(GroupView .is, GroupView );
+    </script>
+</dom-module>

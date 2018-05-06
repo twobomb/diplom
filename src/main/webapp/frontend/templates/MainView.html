@@ -1,7 +1,7 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../components/app-navigation.html">
-<link rel="import" href="bower_components/vaadin-lumo-styles/color.html">
+<link rel="import" href="../components/BreadCrumbs.html">
 
 <dom-module id="main-view">
     <template>
@@ -16,6 +16,7 @@
                 overflow:auto;
             }
         </style>
+        <iron-ajax auto url="../../offline-page.html" handle-as="document" last-response="../../offline-page.html"></iron-ajax>
 
         <custom-style>
             <style include="lumo-color"></style>
@@ -24,6 +25,7 @@
         <div id="root" >
             <div id="nav">
                 <app-navigation id="appNavigation"></app-navigation>
+                <bread-crumbs id="breadCrumbs"></bread-crumbs>
             </div>
             <div id="contentContainer">
                 <slot></slot>
@@ -31,7 +33,21 @@
         </div>
 
     </template>
+    <script>
+        //Регитсрация сервисного работника
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('../../service_worker.js').then(function(registration) {
+                        // Регистрация успешна
+                    }).catch(function(err) {
+                        // Регистрация не успешна
+                        console.log('ServiceWorker регистрация не успешна, ошибка: ', err);
+                    });
+                });
+            }
 
+
+    </script>
     <script>
         class MainView extends Polymer.Element{
             static get is() { return 'main-view'; }

@@ -1,0 +1,125 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/vaadin-icons/vaadin-icons.html">
+
+
+<dom-module id="bread-crumbs">
+<template>
+    <style>
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        #breadcrumbs{
+            border-radius: 5px;
+            box-shadow: 0 0 2px rgba(0,0,0,.2);
+            overflow: hidden;
+            width: 100%;
+        }
+
+        #breadcrumbs li{
+            float: left;
+            background: var(--lumo-contrast-10pct);
+        }
+        #breadcrumbs li:nth-last-child(2){
+            background: none;
+        }
+
+        #breadcrumbs a{
+            padding: .7em 1em .7em 2em;
+            float: left;
+            text-decoration: none;
+            color: var(--lumo-body-text-color);
+            position: relative;
+            text-shadow: 0 1px 0 rgba(255,255,255,.5);
+            background: linear-gradient(to right, rgba(0,0,0,0), var(--lumo-contrast-10pct));
+        }
+
+        #breadcrumbs li:first-child a{
+            padding-left: 1em;
+            border-radius: 5px 0 0 5px;
+        }
+
+        #breadcrumbs a:hover{
+            background: var(--lumo-contrast-70pct);
+            color: var(--lumo-base-color);
+        }
+        #breadcrumbs li:nth-last-child(2):hover a{
+            color: var(--lumo-primary-color);
+        }
+
+        #breadcrumbs a::after,
+        #breadcrumbs a::before{
+            content: "";
+            position: absolute;
+            top: 50%;
+            margin-top: -1.5em;
+            border-top: 1.5em solid transparent;
+            border-bottom: 1.5em solid transparent;
+            border-left: 1em solid transparent;
+            right: -1em;
+        }
+        #breadcrumbs a::before{
+            border-left-color:  var(--lumo-contrast-10pct);
+            right: -1em;
+            z-index: 1;
+        }
+
+        #breadcrumbs li:nth-last-child(3) a::before{
+            border-left-color:  var(--lumo-contrast-20pct);
+            right: -1em;
+        }
+        #breadcrumbs a:hover::after{
+            border-left-color: var(--lumo-contrast-70pct);
+        }
+
+        #breadcrumbs .current,
+        #breadcrumbs .current:hover{
+            font-weight: bold;
+            background: none;
+        }
+        #breadcrumbs .current::after,
+        #breadcrumbs .current::before{
+            content: normal;
+        }
+        iron-icon{
+            height:1em;
+            margin-right: 5px;
+        }
+
+    </style>
+    <ul id="breadcrumbs">
+        <template is="dom-repeat"  items="{{breadcrumbsList}}" >
+        <li>
+            <template is="dom-if" if="{{item.isCurrent}}">
+                <a href="{{item.link}}" class="current"><iron-icon icon="vaadin:vaadin:{{item.icon}}"></iron-icon>{{item.text}}</a>
+            </template>
+            <template is="dom-if" if="{{!item.isCurrent}}">
+                <a href="{{item.link}}"><iron-icon icon="vaadin:vaadin:{{item.icon}}"></iron-icon>{{item.text}}</a>
+            </template>
+        </li>
+        </template>
+    </ul>
+
+</template>
+    <script>
+            class BreadCrumbs extends Polymer.Element {
+            static get is() {
+                return 'bread-crumbs';
+            }
+
+            ready(){
+                super.ready();
+
+            }
+            static get properties() {
+                return {
+
+                };
+            }
+        }
+
+        window.customElements.define(BreadCrumbs.is, BreadCrumbs);
+    </script>
+</dom-module>

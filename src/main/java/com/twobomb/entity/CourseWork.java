@@ -56,6 +56,10 @@ public class CourseWork extends AbstractEntity {
     List<Theme> themes;
 
 
+    public List<TeacherInfo> getTeacherInfos() {
+        return teacherInfos;
+    }
+
     @OneToMany(mappedBy = "courseWork",fetch = FetchType.LAZY)
     List<TeacherInfo> teacherInfos;
 

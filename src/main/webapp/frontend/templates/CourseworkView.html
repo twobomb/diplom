@@ -99,12 +99,24 @@
                         <div class="begindate"> <iron-icon icon="vaadin:vaadin:calendar"></iron-icon> Начало подачи тем {{item.dateBegin}}</div>
                         <div class="enddate"> <iron-icon icon="vaadin:vaadin:alarm"></iron-icon> Конец подачи тем {{item.dateEnd}}</div>
 
-                        <template is="dom-if" if="{{!item.isThemeChecked}}">
-                            <div class="status theme_not_checked"><iron-icon icon="vaadin:vaadin:warning"></iron-icon> Необходимо выбрать тему</div>
+                        <template is="dom-if" if="{{userData.isStudent}}">
+                            <template is="dom-if" if="{{!item.isThemeChecked}}">
+                                <div class="status theme_not_checked"><iron-icon icon="vaadin:vaadin:warning"></iron-icon> Необходимо выбрать тему</div>
+                            </template>
+                            <template is="dom-if" if="{{item.isThemeChecked}}">
+                                <div class="status theme_checked"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon> Тема выбрана</div>
+                            </template>
                         </template>
-                        <template is="dom-if" if="{{item.isThemeChecked}}">
-                            <div class="status theme_checked"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon> Тема выбрана</div>
+
+                        <template is="dom-if" if="{{userData.isTeacher}}">
+                            <template is="dom-if" if="{{!item.isThemeChecked}}">
+                                <div class="status theme_not_checked"><iron-icon icon="vaadin:vaadin:warning"></iron-icon> Необходимо добавить темы</div>
+                            </template>
+                            <template is="dom-if" if="{{item.isThemeChecked}}">
+                                <div class="status theme_checked"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon> Темы добавлены</div>
+                            </template>
                         </template>
+
                     </div>
                 </vaadin-item>
             </template>
@@ -120,7 +132,7 @@
             handleClick(e){
                 var index = e.currentTarget.getElementsByClassName("indexOfMainList")[0].value.trim();
                 if(index != null){
-                    window.location.href = this.themePage+"/"+index;
+                    window.location.href = this.themePage+"/coursework"+index;
                 }
             }
             connectedCallback() {
