@@ -1,6 +1,7 @@
 package com.twobomb.app.security;
 
 import com.twobomb.Utils.AppConst;
+import com.twobomb.entity.Role;
 import com.twobomb.entity.User;
 import com.twobomb.service.RoleService;
 import com.twobomb.service.UserService;
@@ -115,6 +116,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 // Allow all flow internal requests.
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+
 
                 // Allow all requests by logged in users.
                 .anyRequest().hasAnyAuthority(roleService.getAllRoles())

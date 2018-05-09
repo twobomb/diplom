@@ -71,6 +71,7 @@
         <vaadin-list-box id="listDisciplines">
             <template is="dom-repeat" items="{{disciplineInfo}}">
                 <vaadin-item on-click="handleClick">
+                    <input type="text" class="indexOfMainList" hidden value="{{item.indexOfMainList}}">
                     <div class="index">{{item.index}}</div>
                     <div class="name">{{item.disciplineName}}</div>
                     <div class="block_info">
@@ -110,6 +111,26 @@
     </template>
 
     <script>
+        function linkIndexBuilder(indexData) {
+            var link = "";
+            var groups = [];
+            if(indexData != null){
+                if(indexData.indexGroup != null)
+                    groups.push("group"+indexData.indexGroup);
+
+                if(indexData.indexDiscipline!= null)
+                    groups.push("discipline"+indexData.indexDiscipline);
+
+                if(indexData.indexCoursework!= null)
+                    groups.push("coursework"+indexData.indexCoursework);
+            }
+            for(var i = 0; i < groups.length;i++)
+                if(i!=0)
+                    link+="-"+groups[i];
+                else
+                    link+=groups[i];
+            return link;
+        }
         class DisciplinesView extends Polymer.Element{
             static get is(){ return "disciplines-view"; }
 
@@ -119,15 +140,35 @@
 
             }
             handleClick(e){
-                var index = e.currentTarget.getElementsByClassName("index")[0].innerHTML.trim();
+                var index = e.currentTarget.getElementsByClassName("indexOfMainList")[0].value;
                 if(index != null){
-                    window.location.href = this.courseworkPage+"/discipline"+index;
+                  //  index++;
+                    var link = "";
+                    if((this.userData.isTeacher || this.userData.isAdmin) && this.indexData.indexGroup == null){
+                        link = this.indexData.groupPage+"/"+
+                            linkIndexBuilder({
+                                indexGroup:null,
+                                indexDiscipline:index,
+                                indexCoursework:null
+                            });
+                    }
+                    else {
+                        link = this.indexData.courseworkPage + "/" +
+                            linkIndexBuilder({
+                                indexGroup: this.indexData.indexGroup,
+                                indexDiscipline: index,
+                                indexCoursework: null
+                            });
+                    }
+                    window.location.href = link;
                 }
             }
 
             static get properties() {
                 return {
-
+                    indexData:{
+                        value:{}
+                    }
                 };
             }
         }

@@ -124,6 +124,26 @@
     </template>
 
     <script>
+        function linkIndexBuilder(indexData) {
+            var link = "";
+            var groups = [];
+            if(indexData != null){
+                if(indexData.indexGroup != null)
+                    groups.push("group"+indexData.indexGroup);
+
+                if(indexData.indexDiscipline!= null)
+                    groups.push("discipline"+indexData.indexDiscipline);
+
+                if(indexData.indexCoursework!= null)
+                    groups.push("coursework"+indexData.indexCoursework);
+            }
+            for(var i = 0; i < groups.length;i++)
+                if(i!=0)
+                    link+="-"+groups[i];
+                else
+                    link+=groups[i];
+            return link;
+        }
         class CourseworkView extends Polymer.Element {
             static get is() {
                 return "coursework-view";
@@ -132,11 +152,38 @@
             handleClick(e){
                 var index = e.currentTarget.getElementsByClassName("indexOfMainList")[0].value.trim();
                 if(index != null){
-                    window.location.href = this.themePage+"/coursework"+index;
+                    if(this.userData.isStudent) {
+                        var link = this.indexData.themePage + "/" +
+                            linkIndexBuilder({
+                                indexGroup: this.indexData.indexGroup,
+                                indexDiscipline: this.indexData.indexDiscipline,
+                                indexCoursework: index
+                            });
+                        window.location.href = link;
+                    }else if (this.userData.isAdmin || this.userData.isTeacher){
+                        var link = "";
+                        if(this.indexData.indexGroup == null)
+                            link += this.indexData.groupPage + "/";
+                        else
+                            link += this.indexData.themePage + "/";
+                        link+= linkIndexBuilder({
+                                indexGroup: this.indexData.indexGroup,
+                                indexDiscipline: this.indexData.indexDiscipline,
+                                indexCoursework: index
+                            });
+                        window.location.href = link;
+                    }
                 }
             }
             connectedCallback() {
                 super.connectedCallback();
+            }
+            static get properties() {
+                return {
+                    indexData:{
+                        value:{}
+                    }
+                }
             }
 
         }

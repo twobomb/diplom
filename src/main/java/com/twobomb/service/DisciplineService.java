@@ -2,9 +2,7 @@ package com.twobomb.service;
 
 import com.twobomb.Utils.AppConst;
 import com.twobomb.entity.*;
-import com.twobomb.repository.DiscinplineRepository;
-import com.twobomb.repository.GroupRepository;
-import com.twobomb.repository.PersonRepository;
+import com.twobomb.repository.*;
 import com.twobomb.ui.pages.CourseworkView;
 import com.twobomb.ui.pages.DisciplinesView;
 import com.twobomb.ui.pages.GroupView;
@@ -16,6 +14,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -24,16 +23,22 @@ import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
 @SuppressWarnings("Duplicates")
 @Service("DisciplineService")
 @Repository
 @Transactional
 public class DisciplineService {
 
+
     //region Автовайреды
     @Autowired
     DiscinplineRepository discinplineRepository;
 
+    @Autowired
+    ControlDisciplineRepository controlDisciplineRepository;
+
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean;
 
@@ -42,6 +47,9 @@ public class DisciplineService {
 
     @Autowired
     GroupRepository groupRepository;
+
+    @Autowired
+    ThemeRepository themeRepository;
 
     @Autowired
     ApplicationContext ctx;
@@ -189,13 +197,17 @@ public class DisciplineService {
     //endregion
 
     //region Получить лист информации о курсовых для текущего юзера
-    public List<CourseworkView.CourseWorkInfo> getCourseWorkInfoList(Long disId){
+    public List<CourseworkView.CourseWorkInfo> getCourseWorkInfoList(Long indexDiscipline,Long indexGroup) throws Exception {
+
         User currentUser = ctx.getBean("CurrentUser",User.class);
-        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
-        List<CourseWork> courseworksListMain = new ArrayList<>();
-        disciplineList.forEach( discipline -> courseworksListMain.addAll(discipline.getCourseWork()));
-        if(disId >= 0 && disId < disciplineList.size())
-            disciplineList = new ArrayList<>(Collections.singleton(disciplineList.get(Math.toIntExact(disId))));
+        List<Discipline> disciplineList = getMainListEntityByClass(Discipline.class);
+        if((currentUser.getRole().isTeacher() || currentUser.getRole().isAdmin()) && indexGroup != null)
+                disciplineList = getListDisciplineFromGroupAttachedToTeacher(getClassEntityByIndex(indexGroup,Group.class),currentUser.getPerson());
+
+        List<CourseWork> courseworksListMain = getMainListEntityByClass(CourseWork.class);
+
+        if(indexDiscipline != null)
+            disciplineList = new ArrayList<>(Collections.singleton(getClassEntityByIndex(indexDiscipline,Discipline.class)));
 
         List<CourseWork> courseWorks = new ArrayList<>();
 
@@ -207,7 +219,7 @@ public class DisciplineService {
         for(CourseWork cw:courseWorks){
             CourseworkView.CourseWorkInfo courseWorkInfo = new CourseworkView.CourseWorkInfo();
             courseWorkInfo.setIndex(index++);
-            courseWorkInfo.setIndexOfMainList(courseworksListMain.indexOf(cw)+1);
+            courseWorkInfo.setIndexOfMainList(courseworksListMain.indexOf(cw));
             courseWorkInfo.setCourseworkName(cw.getName());
             courseWorkInfo.setDisciplineName(cw.getDiscipline().getName());
             List<Person> teacherAttach = cw.getDiscipline().getAttachedTeachers();
@@ -262,32 +274,62 @@ public class DisciplineService {
     }
     //endregion
 
-    //region Получить лист информации о группах для текущего юзера
-    public List<GroupView.GroupInfo> getListGroupInfo(){
-        User currentUser = ctx.getBean("CurrentUser",User.class);
-        Role role = currentUser.getRole();
-        List<GroupView.GroupInfo> groupInfoList = new ArrayList<>();
+    //region Получить лист связанных с пользователем групп
+    public List<Group> getBindWithUserGroups(User currentUser){
+        if(currentUser.getRole().isStudent())
+            return new ArrayList<>(Collections.singleton(currentUser.getPerson().getGroup()));
 
         List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
         List<Group> groups = new ArrayList<>();
 
         disciplineList.forEach( (discipline) -> {
             discipline.getGroups().forEach((group)->{
-               if(!groups.contains(group))
+                if(!groups.contains(group))
                     groups.add(group);
             });
         });
+        return groups;
+    }
+    //endregion
+
+    //region Получить лист информации о группах для текущего юзера
+    public List<GroupView.GroupInfo> getListGroupInfo(Long indexDiscipline,Long indexCoursework) throws Exception {
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        Role role = currentUser.getRole();
+        Discipline curDisc = null;
+        List<Group> mainListGroups = getMainListEntityByClass(Group.class);
+        List<Group> groups = new ArrayList<>();
+        if(indexDiscipline==null && indexCoursework == null)
+            groups = mainListGroups;
+        else if(indexDiscipline != null){
+            curDisc = getClassEntityByIndex(indexDiscipline,Discipline.class);
+            groups.addAll(curDisc.getGroups());
+        }
+        else if(indexCoursework != null){
+            curDisc = getClassEntityByIndex(indexCoursework,CourseWork.class).getDiscipline();
+            groups.addAll(curDisc.getGroups());
+        }
+
 
         int index = 1;
+        List<GroupView.GroupInfo> groupInfoList = new ArrayList<>();
         for (Group group:groups){
             GroupView.GroupInfo groupInfo = new GroupView.GroupInfo();
             groupInfo.setIndex(index++);
+            groupInfo.setIndexOfMainList(mainListGroups.indexOf(group));
             groupInfo.setCourse(group.getCourse());
             groupInfo.setGroupName(group.getName());
             int countStud = group.getPersons().size();
             groupInfo.setStudentCount(countStud+ " " + trueRussianDecline("студентов","студент","студента",countStud));
             List<CourseWork> courseWorks = getListCourseworkFromGroupAttachedToTeacher(group,currentUser.getPerson());
+
+            final Discipline curDiscFinal = curDisc;
+            if(curDisc != null)
+                courseWorks.removeIf(courseWork -> !courseWork.getDiscipline().equals(curDiscFinal));
+
             groupInfo.setCountCoursework(courseWorks.size());
+
+
             int countDisc = getListDisciplineFromGroupAttachedToTeacher(group,currentUser.getPerson()).size();
             groupInfo.setCountDiscipline(countDisc + " " + trueRussianDecline("ваших","ваша","ваши",countDisc) + " "+ trueRussianDecline("дисциплин","дисциплина","дисциплины",countDisc));
             groupInfo.setIsCheck(true);
@@ -349,22 +391,103 @@ public class DisciplineService {
     }
     //endregion
 
-    //region Получить дополнительную инфу о курсовой n
-    public ThemeView.AdditionalCourseWorkInfo getAdditionalCourseWorkInfo(Long indexCoursework){
+    //region Получить сущность класса (Discipline,Group,Coursework) по индексу из списка всех сущнотей этого класса для текущего юзера
+    public <T> T getClassEntityByIndex(Long index, Class<T> t) throws Exception{
         User currentUser = ctx.getBean("CurrentUser",User.class);
-        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
-        List<CourseWork> courseworksList = new ArrayList<>();
-        disciplineList.forEach( discipline -> courseworksList.addAll(discipline.getCourseWork()));
 
-        CourseWork currentCoursework = null;
-        if(indexCoursework >= 0 && indexCoursework < courseworksList.size())
-            currentCoursework = courseworksList.get(Math.toIntExact(indexCoursework));
+        if(index == null)
+            throw new Exception("Отсутствует индекс для класса "+t.getClass().getName());
+
+        if(t.equals(Discipline.class)){
+            List<Discipline> disciplineList = getMainListEntityByClass(Discipline.class);
+            if(index < 0 || index >= disciplineList.size())
+                throw new Exception("Выход индекса дисциплин за пределы допустимого");
+            return (T) disciplineList.get(Math.toIntExact(index));
+        }else if (t.equals(CourseWork.class)){
+            List<CourseWork> courseworksList = getMainListEntityByClass(CourseWork.class);
+            if(index < 0 || index >= courseworksList.size())
+                throw new Exception("Выход индекса курсовых за пределы допустимого");
+            return (T) courseworksList.get(Math.toIntExact(index));
+        }else if(t.equals(Group.class)){
+            List<Group> groupsList = getMainListEntityByClass(Group.class);
+            if(index < 0 || index >= groupsList.size())
+                throw new Exception("Выход индекса групп за пределы допустимого");
+            return (T) groupsList.get(Math.toIntExact(index));
+        }
         else
-            return null;
+            throw new Exception("Неизвестный класс("+t.getClass().getName()+") для поиска индекса!");
+    }
+    //endregion
 
+    //region Возвращает главный лист сущностей класса T, по нему идет поиск по индексам
+    public <T> List<T> getMainListEntityByClass(Class<T> t) throws Exception{
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+
+        if(t.equals(Discipline.class)){
+            List<Discipline> disciplineList =  getBindDisciplineWidthUser(currentUser);
+            disciplineList.sort(new Comparator<Discipline>() {
+                @Override
+                public int compare(Discipline o1, Discipline o2) {
+                    return o1.getId() > o2.getId() ? -1 : (o1.getId() < o2.getId()) ? 1 : 0;
+                }
+            });
+            return (List<T>) disciplineList;
+        }else if (t.equals(CourseWork.class)){
+            List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+            List<CourseWork> courseworksList = new ArrayList<>();
+            disciplineList.forEach(discipline -> courseworksList.addAll(discipline.getCourseWork()));
+            courseworksList.sort(new Comparator<CourseWork>() {
+                @Override
+                public int compare(CourseWork o1, CourseWork o2) {
+                    return o1.getId() > o2.getId() ? -1 : (o1.getId() < o2.getId()) ? 1 : 0;
+                }
+            });
+            return (List<T>) courseworksList;
+        }else if(t.equals(Group.class)){
+            List<Group> groups = getBindWithUserGroups(currentUser);
+            groups.sort(new Comparator<Group>() {
+                @Override
+                public int compare(Group o1, Group o2) {
+                    return o1.getId() > o2.getId() ? -1 : (o1.getId() < o2.getId()) ? 1 : 0;
+                }
+            });
+            return (List<T>) groups;
+        }
+        else
+            throw new Exception("Неизвестный класс("+t.getClass().getName()+") для поиска главного листа!");
+    }
+    //endregion
+
+    //region У группы есть эта курсовая работа?
+    public boolean isGroupAttachedToCoursework(Group group,CourseWork cw){
+        return group.getDisciplines().contains(cw.getDiscipline());
+    }
+    //endregion
+
+    //region Получить дополнительную инфу о курсовой n
+    public ThemeView.AdditionalCourseWorkInfo getAdditionalCourseWorkInfo(Long indexCoursework,Long indexGroup) throws Exception {
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        List<CourseWork> courseworksList = new ArrayList<>();
+        Group curGroup = null;
+        if(currentUser.getRole().isStudent()) {
+            curGroup = currentUser.getPerson().getGroup();
+            List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
+            disciplineList.forEach(discipline -> courseworksList.addAll(discipline.getCourseWork()));
+        }
+        else if(currentUser.getRole().isTeacher() || currentUser.getRole().isAdmin()){
+            curGroup = getClassEntityByIndex(indexGroup,Group.class);
+            List<Discipline> disciplineList = curGroup.getDisciplines();
+
+            disciplineList.forEach(discipline -> courseworksList.addAll(discipline.getCourseWork()));
+        }
+
+        CourseWork currentCoursework = getClassEntityByIndex(indexCoursework,CourseWork.class);
+
+        if(!isGroupAttachedToCoursework(curGroup,currentCoursework))
+            throw new Exception("Данная курсовая работа не привязана к этой группе!");
         ThemeView.AdditionalCourseWorkInfo info = new ThemeView.AdditionalCourseWorkInfo();
 
-        info.setGroupName(currentUser.getPerson().getGroup().getName());
+        info.setGroupName(curGroup.getName());
         info.setCourseworkName(currentCoursework.getName());
         info.setDisciplineName(currentCoursework.getDiscipline().getName());
         String teachersNames = "";
@@ -376,7 +499,9 @@ public class DisciplineService {
         info.setIsStudentChange(AppConst.DEFAULT_IS_STUDENT_CHANGE);
         info.setIsStudentOffer(AppConst.DEFAULT_IS_STUDENT_OFFER);
         info.setBeginDate("неизвестно");
+        info.setBeginDateForDatePicker("");
         info.setEndDate("неизвестно");
+        info.setEndDateForDatePicker("");
         ControlDiscipline controlDiscipline = currentCoursework.getDiscipline().getControl_discipline();
         if(controlDiscipline != null){
             info.setIsAutoset(controlDiscipline.getIs_autoset());
@@ -400,44 +525,66 @@ public class DisciplineService {
             endDate  += new SimpleDateFormat("dd.MM.yyyy").format(controlDiscipline.getDateEnd());
 
 
+            info.setBeginDateForDatePicker(new SimpleDateFormat("yyyy-MM-dd").format(controlDiscipline.getDateBegin()));
+            info.setEndDateForDatePicker(new SimpleDateFormat("yyyy-MM-dd").format(controlDiscipline.getDateEnd()));
             info.setBeginDate(beginDate);
             info.setEndDate(endDate);
         }
-        int courseNeedThemes = 0;
-        List<Person> teachers =  currentCoursework.getDiscipline().getAttachedTeachers();
-        for(Person teacher:teachers){
-            List<TeacherInfo> teacherInfos =  teacher.getTeacherInfos();
-            for(TeacherInfo ti:teacherInfos)
-                if(ti.getCourseWork().equals(currentCoursework))
-                    courseNeedThemes+=ti.getCount_theme();
+        if(currentUser.getRole().isStudent()) {
+            int courseNeedThemes = 0;
+            List<Person> teachers = currentCoursework.getDiscipline().getAttachedTeachers();
+            for (Person teacher : teachers) {
+                List<TeacherInfo> teacherInfos = teacher.getTeacherInfos();
+                for (TeacherInfo ti : teacherInfos)
+                    if (ti.getCourseWork().equals(currentCoursework))
+                        courseNeedThemes += ti.getCount_theme();
+            }
+            courseNeedThemes = courseNeedThemes - currentCoursework.getThemes().size();
+            info.setTeachersMustAddCount(courseNeedThemes);
         }
-        courseNeedThemes = courseNeedThemes - currentCoursework.getThemes().size();
-        info.setTeachersMustAddCount(courseNeedThemes);
+        else if (currentUser.getRole().isTeacher()){
+            List<Theme> addedThemes = currentUser.getPerson().getAdd_themes();
+            final CourseWork curCwFinal = currentCoursework;
+            addedThemes.removeIf(theme -> !theme.getCourseWorks().contains(curCwFinal));
+
+            List<TeacherInfo> ti = currentUser.getPerson().getTeacherInfos();
+            ti.removeIf(teacherInfo -> !teacherInfo.getCourseWork().equals(curCwFinal));
+            if(ti.size() == 0)
+                Notification.show("Отсутствует информация о необходимом количестве тем для вас!",6000, Notification.Position.BOTTOM_START);
+            else
+                info.setTeachersMustAddCount(ti.get(0).getCount_theme() - addedThemes.size());
+        }
         return info;
 
     }
     //endregion
 
     //region Получить лист информации о темах в курсовой n
-    public List<ThemeView.ThemeItemInfo> getThemeItemInfoList(Long indexCoursework){
-        User currentUser = ctx.getBean("CurrentUser",User.class);
-        List<Discipline> disciplineList = getBindDisciplineWidthUser(currentUser);
-        List<CourseWork> courseworksList = new ArrayList<>();
-        disciplineList.forEach( discipline -> courseworksList.addAll(discipline.getCourseWork()));
+    public List<ThemeView.ThemeItemInfo> getThemeItemInfoList(Long indexCoursework, Long indexGroup) throws Exception {
 
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+
+        Group curGroup = null;
+        if(currentUser.getRole().isStudent())
+            curGroup = currentUser.getPerson().getGroup();
+        else if(currentUser.getRole().isTeacher() || currentUser.getRole().isAdmin())
+            curGroup = getClassEntityByIndex(indexGroup,Group.class);
         List<Theme> themeList = null;
-        CourseWork currentCoursework = null;
+        CourseWork currentCoursework = getClassEntityByIndex(indexCoursework,CourseWork.class);
+
+
+        if(!isGroupAttachedToCoursework(curGroup,currentCoursework))
+            throw new Exception("Данная курсовая работа не привязана к этой группе!");
+
         List<ThemeView.ThemeItemInfo> themeItemInfoList = new ArrayList<>();
-        if(indexCoursework >= 0 && indexCoursework < courseworksList.size()) {
-            currentCoursework = courseworksList.get(Math.toIntExact(indexCoursework));
-            themeList = currentCoursework.getThemes();
-        }
-        else
-            return themeItemInfoList;
+        themeList = currentCoursework.getThemes();
         int index = 1;
         for(Theme t:themeList){
             ThemeView.ThemeItemInfo themeItemInfo = new ThemeView.ThemeItemInfo();
-            themeItemInfo.setTeacherAdd(t.getAdd_person().getLastname()+" "+ t.getAdd_person().getFirstname().charAt(0)+".");
+            if(t.getAdd_person().equals(currentUser.getPerson()))
+                themeItemInfo.setTeacherAdd("Вы");
+            else
+                themeItemInfo.setTeacherAdd(t.getAdd_person().getLastname()+" "+ t.getAdd_person().getFirstname().charAt(0)+".");
             themeItemInfo.setDescription(t.getDescription().isEmpty()?"Описание отсутствует":t.getDescription());
             themeItemInfo.setName(t.getText());
             String editedBy = "";
@@ -452,9 +599,10 @@ public class DisciplineService {
             //Можно ли прикрепится к теме
             Map<CourseWork,Person> mapTmp =  t.getCoueseworkWidthAffixedStudents();
             Map<CourseWork,Person> map =  new HashMap<CourseWork,Person>();
+
             //Исключает студентов не нашей группы
             for(CourseWork key:mapTmp.keySet()){
-                if(mapTmp.get(key).getGroup().equals(currentUser.getPerson().getGroup()))
+                if(mapTmp.get(key).getGroup().equals(curGroup))
                     map.put(key,mapTmp.get(key));
             }
             Person studentAttachToThisTheme = map.get(currentCoursework);
@@ -513,15 +661,23 @@ public class DisciplineService {
     //endregion
 
     //region Получить лист информации о дисциплинах для текущего юзера
-    public List<DisciplinesView.DisciplineInfo> getDisciplineInfoList(){
+    public List<DisciplinesView.DisciplineInfo> getDisciplineInfoList(Long indexGroup) throws Exception {
         User currentUser = ctx.getBean("CurrentUser",User.class);
         Person person = currentUser.getPerson();
 
-        List<Discipline> list = getBindDisciplineWidthUser(currentUser);
+        List<Discipline> list = new ArrayList<>();
+        List<Discipline> mainListDiscipline = getMainListEntityByClass(Discipline.class);
+        list = mainListDiscipline;
+
+        if((currentUser.getRole().isTeacher() || currentUser.getRole().isAdmin()) && indexGroup!= null) {
+            list = getListDisciplineFromGroupAttachedToTeacher(getClassEntityByIndex(indexGroup,Group.class),currentUser.getPerson());
+        }
+
         List<DisciplinesView.DisciplineInfo> disciplineInfos = new ArrayList<>();
         int index = 1;
         for (Discipline l : list) {
             DisciplinesView.DisciplineInfo disciplineInfo = new DisciplinesView.DisciplineInfo();
+            disciplineInfo.setIndexOfMainList(mainListDiscipline.indexOf(l));
             disciplineInfo.setIndex(index++);
             disciplineInfo.setCourseworkCount(l.getCourseWork().size());
             disciplineInfo.setDisciplineName(l.getName());
@@ -679,4 +835,42 @@ public class DisciplineService {
     }
     //endregion
 
+    //region Добавление темы и привязка к курсовой
+    public void addThemeAndAttachToCousework(String name,String description,Long indexCoursework) throws Exception {
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        if(!currentUser.getRole().isTeacher())
+            throw new Exception("Темы могут добавлять только преподаватели!");
+        CourseWork cw = getClassEntityByIndex(indexCoursework,CourseWork.class);
+
+        if(!currentUser.getPerson().getDisciplinesTeacher().contains(cw.getDiscipline()))
+            throw new Exception("Курсовая не привязана к текущему пользователю!");
+
+        Theme theme = new Theme(description,name,currentUser.getPerson());
+        theme.addCourseWork(cw);
+        themeRepository.saveAndFlush(theme);
+    }
+    //endregion
+
+    //region Установка или изменение настроек дисциплины
+    public void setControlDiscipline(Discipline discipline,Date beginDate,Date endDate,boolean isAutoset,boolean isStudentChange,boolean isStudentOffer) throws Exception {
+
+        User currentUser = ctx.getBean("CurrentUser",User.class);
+        if(!currentUser.getRole().isTeacher() && !currentUser.getRole().isAdmin())
+            throw new Exception("У вас недостаточно прав для изменения настроек дисциплины!");
+        //Discipline discipline = getClassEntityByIndex(disciplineIndex,Discipline.class);
+        if(discipline.getControl_discipline() == null){
+            ControlDiscipline cd = new ControlDiscipline(beginDate,endDate,isAutoset,isStudentChange,isStudentOffer,discipline);
+            controlDisciplineRepository.saveAndFlush(cd);
+        }
+        else{
+            ControlDiscipline cd = discipline.getControl_discipline();
+            cd.setDateBegin(beginDate);
+            cd.setDateEnd(endDate);
+            cd.setIs_autoset(isAutoset);
+            cd.setIs_student_change(isStudentChange);
+            cd.setIs_student_offer(isStudentOffer);
+            controlDisciplineRepository.saveAndFlush(cd);
+        }
+    }
+    //endregion
 }

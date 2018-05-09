@@ -1,6 +1,7 @@
 com\twobomb\ui\components\BreadCrumbs.class
 com\twobomb\ui\pages\GroupView$GroupInfo.class
 com\twobomb\entity\AbstractEntity.class
+com\twobomb\service\DisciplineService$3.class
 com\twobomb\app\security\SecurityUtils.class
 com\twobomb\ui\components\BreadCrumbs$ItemInfo.class
 com\twobomb\ui\MainView.class
@@ -16,6 +17,7 @@ com\twobomb\ui\pages\DisciplinesView.class
 com\twobomb\repository\ControlDisciplineRepository.class
 com\twobomb\ui\pages\GroupView.class
 com\twobomb\ui\datacontainers\UserData.class
+com\twobomb\service\DisciplineService$2.class
 com\twobomb\ui\components\BreadCrumbs$Model.class
 com\twobomb\entity\CourseWork.class
 com\twobomb\ui\pages\DisciplinesView$DisciplineInfo.class
@@ -28,6 +30,7 @@ com\twobomb\app\security\CustomRequestCache.class
 com\twobomb\service\RoleService.class
 com\twobomb\entity\Discipline.class
 com\twobomb\ui\models\MainModel.class
+com\twobomb\ui\datacontainers\IndexData.class
 com\twobomb\app\DataGeneration.class
 com\twobomb\ui\pages\CourseworkView$Model.class
 com\twobomb\repository\RoleRepository.class
@@ -57,6 +60,7 @@ com\twobomb\ui\components\PageInfo.class
 com\twobomb\repository\DiscinplineRepository.class
 com\twobomb\app\security\HasLogger.class
 com\twobomb\entity\Theme.class
+com\twobomb\service\DisciplineService$1.class
 com\twobomb\entity\Group.class
 com\twobomb\ui\components\BreadCrumbs$ParseIndexes.class
 com\twobomb\service\UtilService.class

@@ -5,10 +5,254 @@
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
 <link rel="import" href="../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/vaadin-notification/vaadin-notification.html">
+<link rel="import" href="../bower_components/vaadin-dialog/vaadin-dialog.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
+<link rel="import" href="../bower_components/vaadin-form-layout/vaadin-form-layout.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+
 <dom-module id="theme-view">
     <template >
+
+        <!--region Диалоговое окно добавления-->
+        <vaadin-dialog id="addDialog" no-close-on-esc no-close-on-outside-click>
+            <template>
+                <style>
+                    h2{
+                        text-align: center;
+                    }
+                    vaadin-text-field{
+                        min-width: 60%;
+                        margin-left: auto;
+                    }
+                    vaadin-form-layout{
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    vaadin-form-layout>vaadin-form-item{
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                    }
+                    vaadin-form-item{
+                        margin-top: 10px;
+                    }
+                    textarea{
+                        padding: 5px;
+                        box-sizing: border-box;
+                        background: var(--lumo-shade-20pct);
+                        border: none;
+                        border-radius: 3px;
+                        font-size: var(--lumo-font-size-m);
+                        font-family: var(--lumo-font-family);
+                        color: var(--lumo-body-text-color);
+                        line-height: var(--lumo-line-height-m);
+                        font-weight: 600;
+                        min-width: 60%;
+                        max-width: 60%;
+                        margin-left: auto;
+                        height: 10em;
+                    }
+                    .textar{
+                        width: 100% !important;
+                    }
+                    .btnAddFormBLock  vaadin-button:first-child{
+                        float: right;
+                        margin-left: auto;
+                        margin-right: 20px;
+                    }
+                </style>
+                <vaadin-form-layout>
+                    <vaadin-form-item colspan="2">
+                        <h2>Добавление темы</h2>
+                    </vaadin-form-item>
+
+                    <vaadin-form-item colspan="2">
+                        <label slot="label">Название темы</label>
+                        <vaadin-text-field minlength="5" value="{{addThemeData.name}}"></vaadin-text-field>
+                    </vaadin-form-item>
+
+                    <vaadin-form-item class="textar" >
+                        <label slot="label">Описание темы</label>
+                        <textarea value="{{addThemeData.description::input}}" >{{addThemeData.description}}</textarea>
+                    </vaadin-form-item>
+
+                    <vaadin-form-item colspan="2" class="btnAddFormBLock">
+                        <vaadin-button theme="success primary" on-click="addTheme">Добавить</vaadin-button>
+                        <vaadin-button theme="error primary" on-click="closeAddDialog">Отмена</vaadin-button>
+                    </vaadin-form-item>
+                </vaadin-form-layout>
+            </template>
+        </vaadin-dialog>
+        <!--endregion-->
+
+        <!--region Диалоговое окно редактирования настроек-->
+        <vaadin-dialog  id="editSettingsDialog" no-close-on-esc no-close-on-outside-click>
+            <template>
+                <style>
+                    h2{
+                        text-align: center;
+                    }
+                    vaadin-form-layout{
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    vaadin-form-layout>vaadin-form-item{
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                    vaadin-form-item{
+                        margin-top: 10px;
+                    }
+                    .onoffswitch {
+                        left: 20px;
+                        position: relative; width: 125px;
+                        -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+                    }
+                    .onoffswitch-checkbox {
+                        display: none;
+                    }
+                    .onoffswitch-label {
+                        display: block; overflow: hidden; cursor: pointer;
+                        border: 2px solid #999999; border-radius: 50px;
+                    }
+                    .onoffswitch-inner {
+                        display: block; width: 200%; margin-left: -100%;
+                        transition: margin 0.3s ease-in 0s;
+                    }
+                    .onoffswitch-inner:before, .onoffswitch-inner:after {
+                        display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+                        font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+                        box-sizing: border-box;
+                    }
+                    .onoffswitch-inner:before {
+                        content: "Включено";
+                        padding-left: 11px;
+                        background: var(--lumo-success-color);
+                        color:var(--lumo-tint-90pct);
+                    }
+                    .onoffswitch-inner:after {
+                        content: "Отключено";
+                        padding-right: 11px;
+                        background: var(--lumo-error-color);
+                        color:var(--lumo-tint-90pct);
+                        text-align: right;
+                    }
+                    .onoffswitch-switch {
+                        display: block; width: 18px; margin: 6px;
+                        background: #FFFFFF;
+                        position: absolute; top: 0; bottom: 0;
+                        right: 90px;
+                        border: 2px solid #999999; border-radius: 50px;
+                        transition: all 0.3s ease-in 0s;
+                    }
+                    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+                        margin-left: 0;
+                    }
+                    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+                        right: 0px;
+                    }
+                    .switchBlocks>label{
+                        margin-left: auto;
+                    }
+                    .switchBlocks>.onoffswitch{
+                        margin-right: 30%;
+                    }
+                    @media (max-width: 860px) {
+                        .onoffswitch-inner:before {
+                            content: "Вкл";
+                        }
+                        .onoffswitch-inner:after {
+                            content: "Откл";
+                        }
+                        .switchBlocks>.onoffswitch{
+                            margin-right: 0;
+                        }
+                        .onoffswitch-switch{
+                            display: none;
+                        }
+                        .datePicker vaadin-date-picker{
+                            margin: auto;
+                        }
+                    }
+
+                    .datePicker> label{
+                        margin-left: auto;
+                    }
+                    .datePicker vaadin-date-picker{
+                        margin-right: 30%;
+                        margin-left: 30px;
+                    }
+
+                    .btnAddFormBLock  vaadin-button:first-child{
+                        float: right;
+                        margin-left: auto;
+                        margin-right: 20px;
+                    }
+                </style>
+                <vaadin-form-layout id="editSettingsForm">
+                    <vaadin-form-item colspan="2">
+                        <h2>Изменение настроек дисциплины и курсовой</h2>
+                    </vaadin-form-item>
+
+                    <vaadin-form-item colspan="2" class="switchBlocks">
+                        <label slot="label">Автоназначение тем по дате окончания</label>
+                        <div class="onoffswitch" >
+                            <input type="checkbox" checked="{{additionalCourseWorkInfo.tempIsAutoset::change}}" on-click="changeAutoset" name="onoffswitch" class="onoffswitch-checkbox" id="switchAutoset">
+                            <label class="onoffswitch-label" for="switchAutoset">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </vaadin-form-item>
+                    <vaadin-form-item colspan="2" class="switchBlocks">
+                        <label slot="label">Студент может открепляться от выбранной темы</label>
+                        <div class="onoffswitch" >
+                            <input type="checkbox" checked="{{additionalCourseWorkInfo.tempIsStudentChange::change}}" on-click="changeStudentChange" name="onoffswitch" class="onoffswitch-checkbox" id="switchStudentChange">
+                            <label class="onoffswitch-label" for="switchStudentChange">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </vaadin-form-item>
+                    <vaadin-form-item colspan="2" class="switchBlocks">
+                        <label slot="label">Студент может предложить свою тему</label>
+                        <div class="onoffswitch" >
+                            <input type="checkbox" checked="{{additionalCourseWorkInfo.tempIsStudentOffer::change}}" on-click="changeStudentOffer" name="onoffswitch" class="onoffswitch-checkbox" id="switchStudentOffer">
+                            <label class="onoffswitch-label" for="switchStudentOffer">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </vaadin-form-item>
+
+                    <vaadin-form-item colspan="2" class="datePicker">
+                        <label slot="label">Дата начала подачи тем</label>
+                        <vaadin-date-picker placeholder="Выберите дату" max="{{additionalCourseWorkInfo.tempEndDate}}" value="{{additionalCourseWorkInfo.tempBeginDate}}">
+                        </vaadin-date-picker>
+                    </vaadin-form-item>
+
+                    <vaadin-form-item colspan="2" class="datePicker">
+                        <label slot="label">Дата конца подачи тем</label>
+                        <vaadin-date-picker placeholder="Выберите дату" min="{{additionalCourseWorkInfo.tempBeginDate}}" value="{{additionalCourseWorkInfo.tempEndDate}}">
+                        </vaadin-date-picker>
+                    </vaadin-form-item>
+                    <vaadin-form-item colspan="2" class="btnAddFormBLock">
+                        <vaadin-button theme="success primary" on-click="saveSettings">Сохранить</vaadin-button>
+                        <vaadin-button theme="error primary" on-click="closeSettingsDialog">Отмена</vaadin-button>
+                    </vaadin-form-item>
+                </vaadin-form-layout>
+
+            </template>
+        </vaadin-dialog>
+        <!--endregion-->
+
+        <!--region Дополнительная инфа о теме-->
         <style>
+
             #aboutBlock div{
                 transition: 2s;
             }
@@ -60,30 +304,30 @@
                 border-bottom:3px solid var(--lumo-success-color);
                 margin-right: auto;
             }
-             #dopinfo div{
-                 color:var(--lumo-secondary-text-color);
-                 font-size: 1.1em;
-                 font-weight: 500;
-                 margin-top: 15px;
-                 padding-bottom: 5px;
-                 border-bottom: 1px solid var(--lumo-shade-90pct);
+            #dopinfo div{
+                color:var(--lumo-secondary-text-color);
+                font-size: 1.1em;
+                font-weight: 500;
+                margin-top: 15px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid var(--lumo-shade-90pct);
             }
-             .statusOn{
-                 border-radius: 15px;
-                 padding: 2px 5px;
-                 font-size:.9em;
-                 background: var(--lumo-success-color);
-                 color:var(--lumo-tint-90pct);
-                 float:right;
-             }
-             .statusOff{
-                 border-radius: 15px;
-                 padding: 2px 5px;
-                 font-size:.9em;
-                 background: var(--lumo-error-color);
-                 color:var(--lumo-tint-90pct);
-                 float:right;
-             }
+            .statusOn{
+                border-radius: 15px;
+                padding: 2px 5px;
+                font-size:.9em;
+                background: var(--lumo-success-color);
+                color:var(--lumo-tint-90pct);
+                float:right;
+            }
+            .statusOff{
+                border-radius: 15px;
+                padding: 2px 5px;
+                font-size:.9em;
+                background: var(--lumo-error-color);
+                color:var(--lumo-tint-90pct);
+                float:right;
+            }
             #aboutBlock .row{
                 display: flex;
                 flex-direction: row;
@@ -99,51 +343,73 @@
 
 
         </style>
-                 <h2 class="row">{{additionalCourseWorkInfo.courseworkName}}</h2>
-            <div id="aboutBlock">
-                <span class="row groupname">Группа: {{additionalCourseWorkInfo.groupName}}</span>
-                <span class="row"><span class="nameColorInfo">Дисциплина: </span> {{additionalCourseWorkInfo.disciplineName}}</span>
-                <span class="row"><span class="nameColorInfo">Преподаватели: </span> {{additionalCourseWorkInfo.teachers}}</span>
-                <div class="row beginThemeInfo">Начало подачи тем {{additionalCourseWorkInfo.beginDate}}
-                </div>
-                <div class="row endThemeInfo">Конец подачи тем
-                    {{additionalCourseWorkInfo.endDate}}
-                </div>
-                <template is="dom-if" if="{{additionalCourseWorkInfo.isNeedWarnCount}}">
+
+
+
+        <h2 class="row">{{additionalCourseWorkInfo.courseworkName}}</h2>
+        <div id="aboutBlock">
+            <span class="row groupname">Группа: {{additionalCourseWorkInfo.groupName}}</span>
+            <span class="row"><span class="nameColorInfo">Дисциплина: </span> {{additionalCourseWorkInfo.disciplineName}}</span>
+            <span class="row"><span class="nameColorInfo">Преподаватели: </span> {{additionalCourseWorkInfo.teachers}}</span>
+            <div class="row beginThemeInfo">Начало подачи тем {{additionalCourseWorkInfo.beginDate}}
+            </div>
+            <div class="row endThemeInfo">Конец подачи тем
+                {{additionalCourseWorkInfo.endDate}}
+            </div>
+            <template is="dom-if" if="{{userData.isTeacher}}">
+                <vaadin-button theme="success primary" id="btnOpenDlg"  on-click="openDialog">Добавить тему</vaadin-button>
+            </template>
+
+            <template is="dom-if" if="{{userData.isTeacher}}">
+                <vaadin-button theme="success" id="btnOpenSettingsDlg"  on-click="openSettingsDialog">Изменить настройки курсовой и дисциплины</vaadin-button>
+            </template>
+
+            <template is="dom-if" if="{{userData.isAdmin}}">
+                <vaadin-button theme="success" id="btnOpenSettingsDlg"  on-click="openSettingsDialog">Изменить настройки курсовой и дисциплины</vaadin-button>
+            </template>
+
+            <template is="dom-if" if="{{additionalCourseWorkInfo.isNeedWarnCount}}">
+                <template is="dom-if" if="{{userData.isStudent}}">
                     <span class="row warn">Преподаватели должны добавить еще минимум {{additionalCourseWorkInfo.teachersMustAddCount}} </span>
                 </template>
-                <vaadin-button on-click="showDopInfo" >Дополонительные установки</vaadin-button>
-                <iron-collapse id="dopinfo" >
-                    <div>Автоназначение тем по дате окончания
-                        <template  is="dom-if" if="{{!additionalCourseWorkInfo.isAutoset}}">
-                            <span class="statusOff">Отключено</span>
-                        </template>
-                        <template is="dom-if" if="{{additionalCourseWorkInfo.isAutoset}}">
-                            <span class="statusOn">Включено</span>
-                        </template>
-                    </div>
-                    <div>Студент может открепляться от выбранной темы
-                        <template  is="dom-if" if="{{!additionalCourseWorkInfo.isStudentChange}}">
-                            <span class="statusOff">Отключено</span>
-                        </template>
-                        <template is="dom-if" if="{{additionalCourseWorkInfo.isStudentChange}}">
-                            <span class="statusOn">Включено</span>
-                        </template>
-                    </div>
-                    <div>Студент может предложить свою тему
-                        <template  is="dom-if" if="{{!additionalCourseWorkInfo.isStudentOffer}}">
-                            <span class="statusOff">Отключено</span>
-                        </template>
-                        <template is="dom-if" if="{{additionalCourseWorkInfo.isStudentOffer}}">
-                            <span class="statusOn">Включено</span>
-                        </template>
-                    </div>
+                <template is="dom-if" if="{{userData.isTeacher}}">
+                    <span class="row warn">Вам необходимо добавить еще минимум {{additionalCourseWorkInfo.teachersMustAddCount}} </span>
+                </template>
+            </template>
+            <vaadin-button on-click="showDopInfo" >Дополонительные установки</vaadin-button>
+            <iron-collapse id="dopinfo" >
+                <div>Автоназначение тем по дате окончания
+                    <template  is="dom-if" if="{{!additionalCourseWorkInfo.isAutoset}}">
+                        <span class="statusOff">Отключено</span>
+                    </template>
+                    <template is="dom-if" if="{{additionalCourseWorkInfo.isAutoset}}">
+                        <span class="statusOn">Включено</span>
+                    </template>
+                </div>
+                <div>Студент может открепляться от выбранной темы
+                    <template  is="dom-if" if="{{!additionalCourseWorkInfo.isStudentChange}}">
+                        <span class="statusOff">Отключено</span>
+                    </template>
+                    <template is="dom-if" if="{{additionalCourseWorkInfo.isStudentChange}}">
+                        <span class="statusOn">Включено</span>
+                    </template>
+                </div>
+                <div>Студент может предложить свою тему
+                    <template  is="dom-if" if="{{!additionalCourseWorkInfo.isStudentOffer}}">
+                        <span class="statusOff">Отключено</span>
+                    </template>
+                    <template is="dom-if" if="{{additionalCourseWorkInfo.isStudentOffer}}">
+                        <span class="statusOn">Включено</span>
+                    </template>
+                </div>
 
-                </iron-collapse>
+            </iron-collapse>
 
-            </div>
+        </div>
 
+        <!--endregion-->
 
+        <!--region Лист тем-->
 <style>
         vaadin-list-box{
         margin-top: 20px;
@@ -274,7 +540,7 @@
                                         <paper-tooltip offset="0">Смотрите дату начала и конца подачи тем</paper-tooltip>
                                 </template>
                                 <template  is="dom-if" if="{{!item.isDisabledAttachBtn}}">
-                                    <vaadin-button on-click="attachMe"  data-index$="{{item.index}}" class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
+                                    <vaadin-button on-click="attachMe"  dat a-index$="{{item.index}}" class="attachTheme"><iron-icon icon="vaadin:vaadin:user-check"></iron-icon>Закрепится за темой</vaadin-button>
                                 </template>
                             </template>
                             <template  is="dom-if" if="{{item.isCurrentUserAttach}}">
@@ -296,6 +562,7 @@
             </template>
         </vaadin-list-box>
 
+        <!--endregion-->
 
         </template>
     <script>
@@ -312,9 +579,75 @@
             return "";
         }
 
+        function showError(parent,txt) {
+            var toast = document.createElement("paper-toast");
+            toast.setAttribute("opened",true);
+            toast.setAttribute("duration",5000);
+            toast.setAttribute("class","errorMsg");
+            toast.setAttribute("style","--paper-toast-background-color:var(--lumo-error-color-50pct);--paper-toast-color:var(--lumo-tint-text-color-90pct);--iron-icon-fill-color: var(--lumo-tint-text-color-90pct;");
+
+            toast.innerHTML = " <iron-icon icon=\"vaadin:vaadin:warning\"  ></iron-icon><span>"+txt+"</span>";
+            parent.appendChild(toast);
+        }
+        function showSuccess(parent,txt) {
+            var toast = document.createElement("paper-toast");
+            toast.setAttribute("opened",true);
+            toast.setAttribute("duration",5000);
+            toast.setAttribute("class","errorMsg");
+            toast.setAttribute("style","--paper-toast-background-color:var(--lumo-success-color-50pct);--paper-toast-color:var(--lumo-tint-text-color-90pct);--iron-icon-fill-color: var(--lumo-tint-text-color-90pct;");
+
+            toast.innerHTML = " <iron-icon icon=\"vaadin:vaadin:check\"  ></iron-icon><span>"+txt+"</span>";
+            parent.appendChild(toast);
+        }
+
         class ThemeView extends Polymer.Element {
             static get is() {
                 return "theme-view";
+            }
+            closeSettingsDialog(){
+                this.set("additionalCourseWorkInfo.tempBeginDate",this.additionalCourseWorkInfo.beginDateForDatePicker);
+                this.set("additionalCourseWorkInfo.tempEndDate",this.additionalCourseWorkInfo.endDateForDatePicker);
+                this.set("additionalCourseWorkInfo.tempIsStudentOffer",this.additionalCourseWorkInfo.isStudentOffer);
+                this.set("additionalCourseWorkInfo.tempIsStudentChange",this.additionalCourseWorkInfo.isStudentChange);
+                this.set("additionalCourseWorkInfo.tempIsAutoset",this.additionalCourseWorkInfo.isAutoset);
+
+                this.$.editSettingsDialog.opened = false;
+            }
+            saveSettings(event){
+                this.$.editSettingsDialog.opened = false;
+                event.changeSettingsData = {
+                    beginDate: this.additionalCourseWorkInfo.tempBeginDate,
+                    endDate: this.additionalCourseWorkInfo.tempEndDate,
+                    isStudentOffer: this.additionalCourseWorkInfo.tempIsStudentOffer,
+                    isAutoset: this.additionalCourseWorkInfo.tempIsAutoset,
+                    isStudentChange: this.additionalCourseWorkInfo.tempIsStudentChange
+                };
+            }
+            changeAutoset(){
+                //alert("OK")
+            }
+            openSettingsDialog(){
+                this.$.editSettingsDialog.opened = true;
+            }
+            openDialog () {
+                this.$.addDialog.opened  = true;
+            };
+            closeAddDialog () {
+                this.$.addDialog.opened  = false;
+                this.addThemeData = {};
+            };
+            addTheme(event){
+
+                if(this.addThemeData.name == null || this.addThemeData.name.length < 5){
+                    showError(document.body,"Добавьте название темы!");
+                    event.addThemeData = {name:""}
+                    event.preventDefault();
+                    return;
+                }
+                this.$.addDialog.opened  = false;
+                event.addThemeData = this.addThemeData;
+                showSuccess(document.body,"Тема добавлена");
+                this.addThemeData = {};
             }
             attachMe(event){
                 var index = event.srcElement.getAttribute("data-index") -1;
@@ -345,10 +678,33 @@
 
             static get properties() {
                 return {
+                    addThemeData:{
+                      value:{
+                          name:"",
+                          description:""
+                      }
+                    },
                         additionalCourseWorkInfo:{
-                          observer(){
-                              this.set('additionalCourseWorkInfo.isNeedWarnCount', this.additionalCourseWorkInfo.teachersMustAddCount > 0);
-                              this.set('additionalCourseWorkInfo.teachersMustAddCount',this.additionalCourseWorkInfo.teachersMustAddCount+" "+ trueRussianDecline("тем","тему","темы",this.additionalCourseWorkInfo.teachersMustAddCount));
+                            type:Object,
+                          observer(newValue, oldValue){
+                                var _this = this;
+                              var promise = new Promise(function (res,rej) {
+                                  (function _handl() {
+                                        if(_this.additionalCourseWorkInfo.teachersMustAddCount != null)
+                                            res(_this.additionalCourseWorkInfo);
+                                        else
+                                            setTimeout(_handl,10);
+                                    })();
+                              });
+                              promise.then(function (obj) {
+                                  _this.set('additionalCourseWorkInfo.isNeedWarnCount', obj.teachersMustAddCount > 0);
+                                  _this.set('additionalCourseWorkInfo.teachersMustAddCount',obj.teachersMustAddCount+" "+ trueRussianDecline("тем","тему","темы",obj.teachersMustAddCount));
+                                  _this.set('additionalCourseWorkInfo.tempBeginDate',obj.beginDateForDatePicker);
+                                  _this.set('additionalCourseWorkInfo.tempEndDate',obj.endDateForDatePicker);
+                                  _this.set('additionalCourseWorkInfo.tempIsStudentOffer',obj.isStudentOffer);
+                                  _this.set('additionalCourseWorkInfo.tempIsAutoset',obj.isAutoset);
+                                  _this.set('additionalCourseWorkInfo.tempIsStudentChange',obj.isStudentChange);
+                              });
                           }
                         },
                         themeItemInfo:{

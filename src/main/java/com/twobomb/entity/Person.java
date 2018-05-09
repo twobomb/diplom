@@ -57,15 +57,6 @@ public class Person extends AbstractEntity{
     @OneToMany(mappedBy = "person",fetch = FetchType.LAZY)
     private List<TeacherInfo> teacherInfos;
 
-    public boolean isTeacher(){
-        return getUser().getRole().getRole().equals(Role.TEACHER);
-    }
-    public boolean isAdmin(){
-        return getUser().getRole().getRole().equals(Role.ADMIN);
-    }
-    public boolean isStudent(){
-        return getUser().getRole().getRole().equals(Role.ADMIN);
-    }
 
     public List<TeacherInfo> getTeacherInfos() {
         return teacherInfos;
@@ -73,7 +64,7 @@ public class Person extends AbstractEntity{
 
     public void addTeacherInfo(TeacherInfo teacherInfo){
         try{
-            if(!isTeacher())
+            if(!getUser().getRole().isTeacher())
                 throw new Exception("This person not have role teacher");
         }
         catch (Exception e){

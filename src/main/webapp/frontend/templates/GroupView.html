@@ -84,17 +84,26 @@
                 color:var(--lumo-primary-color);
                 border-bottom:1px solid var(--lumo-primary-color);
             }
+            @media(min-width: 1000px) {
+
+                vaadin-list-box>vaadin-item .statusBlock>div{
+                    min-width: 250px;
+
+                }
+            }
             vaadin-list-box>vaadin-item .groupInfo .countDisc{
                 font-size: 1em;
                 color:var(--lumo-error-color);
                 border-bottom:1px solid var(--lumo-error-color);
             }
+
         </style>
 
 
         <vaadin-list-box id="listCourseworks">
             <template is="dom-repeat" items="{{groupInfo}}">
                 <vaadin-item on-click="handleClick">
+                    <input type="text" class="indexOfMainList" hidden value="{{item.indexOfMainList}}">
                     <div class="themeIndex col">{{item.index}}</div>
                     <div class="col groupInfo">
                         <div class="groupName row">Группа {{item.groupName}} - {{item.course}} курс</div>
@@ -103,24 +112,30 @@
                     </div>
                     <div class="col statusBlock">
                         <template is="dom-if" if="{{userData.isTeacher}}">
-                            <template is="dom-if" if="{{item.isChecked}}">
-                                <div class="themeName row success"><iron-icon icon="vaadin:vaadin:check"></iron-icon>Все темы добавлены</div>
+                            <template is="dom-if" if="{{item.isCheck}}">
+                                <div class="row success"><iron-icon icon="vaadin:vaadin:check"></iron-icon>Все темы добавлены</div>
                             </template>
-                            <template is="dom-if" if="{{!item.isChecked}}">
-                                <div class="themeName row error"><iron-icon icon="vaadin:vaadin:warning"></iron-icon>Необходимо добавить темы</div>
+                            <template is="dom-if" if="{{!item.isCheck}}">
+                                <div class=" row error"><iron-icon icon="vaadin:vaadin:warning"></iron-icon>Необходимо добавить темы</div>
                             </template>
                         </template>
                         <div class="themeName row"><iron-icon icon="vaadin:vaadin:file-text-o"></iron-icon>Курсовых {{item.countCoursework}}</div>
                     </div>
                     <div class="buttonBlock col">
-                            <vaadin-button>
-                                <iron-icon icon="vaadin:vaadin:list"></iron-icon>
+                        <template is="dom-if" if="{{!miscInfo.isCourseworkChecked}}">
+                        <template is="dom-if" if="{{!miscInfo.isDisciplineChecked}}">
+                            <vaadin-button on-click="showDisciplines">
+                                <input type="text" class="indexOfMainList" hidden value="{{item.indexOfMainList}}">
+                                <iron-icon icon="vaadin:vaadin:list" ></iron-icon>
                                 Просмотр дисциплин
                             </vaadin-button>
-                        <vaadin-button>
-                            <iron-icon icon="vaadin:vaadin:file-text-o"></iron-icon>
-                            Просмотр курсовых
-                        </vaadin-button>
+                            <vaadin-button on-click="showCourseworks">
+                                <input type="text" class="indexOfMainList" hidden value="{{item.indexOfMainList}}">
+                                <iron-icon icon="vaadin:vaadin:file-text-o" ></iron-icon>
+                                Просмотр курсовых
+                            </vaadin-button>
+                        </template>
+                        </template>
                     </div>
                 </vaadin-item>
             </template>
@@ -129,6 +144,28 @@
     </template>
 
     <script>
+
+        function linkIndexBuilder(indexData) {
+            var link = "";
+            var groups = [];
+            if(indexData != null){
+                if(indexData.indexGroup != null)
+                    groups.push("group"+indexData.indexGroup);
+
+                if(indexData.indexDiscipline!= null)
+                    groups.push("discipline"+indexData.indexDiscipline);
+
+                if(indexData.indexCoursework!= null)
+                    groups.push("coursework"+indexData.indexCoursework);
+            }
+            for(var i = 0; i < groups.length;i++)
+                if(i!=0)
+                    link+="-"+groups[i];
+                else
+                    link+=groups[i];
+            return link;
+        }
+
         function trueRussianDecline(d1, d2,d3, c){
             switch (c%100){
                 case 11: case 12: case 13: case 14:return d1;
@@ -146,14 +183,71 @@
             static get is() {
                 return "group-view";
             }
-
+            showDisciplines(e){
+                var index = e.currentTarget.getElementsByClassName("indexOfMainList")[0].value.trim();
+                if(index != null){
+                    var link = this.indexData.disciplinePage+"/"+
+                        linkIndexBuilder({
+                            indexGroup:index,
+                            indexDiscipline:null,
+                            indexCoursework:null
+                        });
+                    window.location.href = link;
+                }
+            }
+            showCourseworks(e){
+                var index = e.currentTarget.getElementsByClassName("indexOfMainList")[0].value.trim();
+                if(index != null){
+                    var link = this.indexData.courseworkPage+"/"+
+                        linkIndexBuilder({
+                            indexGroup:index,
+                            indexDiscipline:this.indexData.indexDiscipline,
+                            indexCoursework:null
+                        });
+                    window.location.href = link;
+                }
+            }
+            handleClick(e){
+                var index = e.currentTarget.getElementsByClassName("indexOfMainList")[0].value.trim();
+                if(index != null){
+                    if(this.miscInfo.isCourseworkChecked){
+                            var link = this.indexData.themePage+"/"+
+                                linkIndexBuilder({
+                                    indexGroup:index,
+                                    indexDiscipline:this.indexData.indexDiscipline,
+                                    indexCoursework:this.indexData.indexCoursework
+                                });
+                            window.location.href = link;
+                        }
+                        else if(this.miscInfo.isDisciplineChecked){
+                            var link = this.indexData.courseworkPage+"/"+
+                                linkIndexBuilder({
+                                    indexGroup:index,
+                                    indexDiscipline:this.indexData.indexDiscipline,
+                                    indexCoursework:null
+                                });
+                            window.location.href = link;
+                        }
+                }
+            }
             connectedCallback() {
                 super.connectedCallback();
             }
 
             static get properties() {
                 return {
-
+                    groupInfo:{
+                        observer(){
+                            this.miscInfo = {
+                                isCourseworkChecked: false,
+                                isDisciplineChecked: false
+                            };
+                            if(this.indexData.indexCoursework != null)
+                                this.miscInfo = { isCourseworkChecked: true};
+                            if(this.indexData.indexDiscipline != null)
+                                this.miscInfo = { isDisciplineChecked: true};
+                        }
+                    }
                 }
             }
         }

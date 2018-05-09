@@ -1,14 +1,18 @@
 package com.twobomb.ui.pages;
 
 import com.twobomb.Utils.AppConst;
+import com.twobomb.entity.CourseWork;
+import com.twobomb.entity.Discipline;
 import com.twobomb.entity.User;
 import com.twobomb.service.DisciplineService;
 import com.twobomb.ui.MainView;
 import com.twobomb.ui.components.BreadCrumbs;
+import com.twobomb.ui.datacontainers.IndexData;
 import com.twobomb.ui.datacontainers.UserData;
 import com.twobomb.ui.models.MainModel;
 import com.vaadin.flow.component.EventData;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.polymertemplate.EventHandler;
@@ -16,9 +20,9 @@ import com.vaadin.flow.component.polymertemplate.ModelItem;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.templatemodel.TemplateModel;
-import com.vaadin.ui.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Date;
 import java.util.List;
 
 @Tag("theme-view")
@@ -30,13 +34,13 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
 
 
     DisciplineService disciplineService;
-
+    User currentUser;
     Long indexCoursework;
     String urlParametr = "";
     @Autowired
     public ThemeView(DisciplineService disciplineService,User currentUser) {
         this.disciplineService = disciplineService;
-        getModel().setUserData(UserData.getInstance(currentUser));
+        this.currentUser = currentUser;
     }
 
     public interface Model extends MainModel {
@@ -44,6 +48,47 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
         void setAdditionalCourseWorkInfo(AdditionalCourseWorkInfo d);
         void setError(String s);
 
+    }
+
+    @EventHandler
+    public void saveSettings(@EventData("event.changeSettingsData.beginDate") String beginDate,
+                             @EventData("event.changeSettingsData.endDate") String endDate,
+                             @EventData("event.changeSettingsData.isAutoset") Boolean isAutoset,
+                             @EventData("event.changeSettingsData.isStudentChange") Boolean isStudentChange,
+                             @EventData("event.changeSettingsData.isStudentOffer") Boolean isStudentOffer){
+
+        try {
+            Discipline discipline = disciplineService.getClassEntityByIndex(BreadCrumbs.parseIndex(urlParametr, BreadCrumbs.ParseIndexes.COURSEWORK), CourseWork.class).getDiscipline();
+            disciplineService.setControlDiscipline(
+                    discipline,
+                    Date.valueOf(beginDate),
+                    Date.valueOf(endDate),
+                    isAutoset,
+                    isStudentChange,
+                    isStudentOffer
+                    );
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notification.show(e.getMessage(), 5000, Notification.Position.BOTTOM_START);
+        }
+
+        setParameter(null,urlParametr);
+    }
+    @EventHandler
+    public void addTheme(@EventData("event.addThemeData.name") String name,@EventData("event.addThemeData.description") String description){
+        if(name != null){
+            if(!name.trim().equals("")) {
+                Long indexCoursework = BreadCrumbs.parseIndex(urlParametr, BreadCrumbs.ParseIndexes.COURSEWORK);
+                try {
+                    disciplineService.addThemeAndAttachToCousework(name.trim(), description.trim(), indexCoursework);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Notification.show(e.getMessage(), 5000, Notification.Position.BOTTOM_START);
+                }
+            }
+        }
+//        UI.getCurrent().getPage().getHistory().go(0);
+        setParameter(null,urlParametr);
     }
 
     @EventHandler
@@ -76,7 +121,9 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
         String teachers;
         String groupName;
         String beginDate;
+        String beginDateForDatePicker;
         String endDate;
+        String endDateForDatePicker;
         Integer teachersMustAddCount;
         Boolean isAutoset;
         Boolean isStudentOffer;
@@ -85,6 +132,21 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
         public AdditionalCourseWorkInfo() {
         }
 
+        public String getBeginDateForDatePicker() {
+            return beginDateForDatePicker;
+        }
+
+        public void setBeginDateForDatePicker(String beginDateForDatePicker) {
+            this.beginDateForDatePicker = beginDateForDatePicker;
+        }
+
+        public String getEndDateForDatePicker() {
+            return endDateForDatePicker;
+        }
+
+        public void setEndDateForDatePicker(String endDateForDatePicker) {
+            this.endDateForDatePicker = endDateForDatePicker;
+        }
 
         public String getCourseworkName() {
             return courseworkName;
@@ -261,22 +323,35 @@ public class ThemeView extends PolymerTemplate<ThemeView.Model> implements HasUr
     }
     @Override
     public void setParameter(BeforeEvent beforeEvent,@OptionalParameter String str) {
-        Long aLong = null;
-        if(str != null) {
-            aLong = Long.valueOf(BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.COURSEWORK));
-            urlParametr = str;
-        }
+        Long indexCoursework = BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.COURSEWORK);
 
-        if(aLong == null) {
+        Long indexGroup= BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.GROUP);
+        Long indexDiscipline = BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.DISCIPLINE);
+
+        if(str != null)
+            urlParametr = str;
+
+        getModel().setUserData(UserData.getInstance(currentUser));
+        getModel().setIndexData(IndexData.Instance(str));
+
+        if(indexCoursework == null) {
             Notification.show("Выберите курсовую чтобы просмотреть темы",4000, Notification.Position.BOTTOM_START);
             com.vaadin.flow.component.UI.getCurrent().getPage().executeJavaScript("location.assign('"+AppConst.PAGE_COURSEWORKS+"')");
-        }else {
-            aLong = aLong == null ? -1 : (aLong - 1);
-            indexCoursework = aLong;
-            List<ThemeItemInfo> themeItemInfos = disciplineService.getThemeItemInfoList(aLong);
+        }
+        else if((currentUser.getRole().isTeacher() || currentUser.getRole().isAdmin()) && indexGroup == null) {
+            Notification.show("Выберите группу чтобы просмотреть темы",4000, Notification.Position.BOTTOM_START);
 
-            getModel().setAdditionalCourseWorkInfo(disciplineService.getAdditionalCourseWorkInfo(aLong));
-            getModel().setThemeItemInfo(themeItemInfos);
+        }else {
+            this.indexCoursework = indexCoursework;
+
+            try {
+                getModel().setAdditionalCourseWorkInfo(disciplineService.getAdditionalCourseWorkInfo(indexCoursework,indexGroup));
+                getModel().setThemeItemInfo(disciplineService.getThemeItemInfoList(indexCoursework,indexGroup));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Notification.show(e.getMessage(),5000, Notification.Position.BOTTOM_START);
+                com.vaadin.flow.component.UI.getCurrent().getPage().executeJavaScript("location.assign('"+AppConst.PAGE_COURSEWORKS+"')");
+            }
         }
     }
 }

@@ -5,10 +5,13 @@ import com.twobomb.entity.Role;
 import com.twobomb.entity.User;
 import com.twobomb.service.DisciplineService;
 import com.twobomb.ui.MainView;
+import com.twobomb.ui.components.BreadCrumbs;
+import com.twobomb.ui.datacontainers.IndexData;
 import com.twobomb.ui.datacontainers.UserData;
 import com.twobomb.ui.models.MainModel;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.router.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,7 @@ import java.util.List;
 @Secured({Role.TEACHER, Role.ADMIN})
 //@RouteAlias(value = AppConst.PAGE_DISCIPLINES, layout = MainView.class)
 @PageTitle(AppConst.TITLE_GROUPS)
-public class GroupView extends PolymerTemplate<GroupView.Model> implements HasUrlParameter<Long> {
+public class GroupView extends PolymerTemplate<GroupView.Model> implements HasUrlParameter<String> {
 
     private User currentUser;
     private DisciplineService disciplineService;
@@ -34,9 +37,19 @@ public class GroupView extends PolymerTemplate<GroupView.Model> implements HasUr
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter Long aLong) {
-        getModel().setGroupInfo(disciplineService.getListGroupInfo());
+    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String str) {
+
+        Long indexDiscipline = BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.DISCIPLINE);
+        Long indexCoursework = BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.COURSEWORK);
+
+        try {
+            getModel().setGroupInfo(disciplineService.getListGroupInfo(indexDiscipline,indexCoursework));
+        } catch (Exception e) {
+            Notification.show(e.getMessage(),5000, Notification.Position.BOTTOM_START);
+            e.printStackTrace();
+        }
         getModel().setUserData(UserData.getInstance(currentUser));
+        getModel().setIndexData(IndexData.Instance(str));
 
     }
 
@@ -49,6 +62,7 @@ public class GroupView extends PolymerTemplate<GroupView.Model> implements HasUr
 
     public static class GroupInfo {
         private Integer index;
+        private Integer indexOfMainList;
         private String groupName;
         private String studentCount;
         private String countDiscipline;
@@ -62,6 +76,14 @@ public class GroupView extends PolymerTemplate<GroupView.Model> implements HasUr
 
         public GroupInfo() {
 
+        }
+
+        public Integer getIndexOfMainList() {
+            return indexOfMainList;
+        }
+
+        public void setIndexOfMainList(Integer indexOfMainList) {
+            this.indexOfMainList = indexOfMainList;
         }
 
         public Integer getCourse() {

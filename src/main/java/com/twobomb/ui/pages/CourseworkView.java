@@ -5,13 +5,14 @@ import com.twobomb.entity.User;
 import com.twobomb.service.DisciplineService;
 import com.twobomb.ui.MainView;
 import com.twobomb.ui.components.BreadCrumbs;
+import com.twobomb.ui.datacontainers.IndexData;
 import com.twobomb.ui.datacontainers.UserData;
 import com.twobomb.ui.models.MainModel;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.templatemodel.TemplateModel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -30,24 +31,28 @@ public class CourseworkView extends PolymerTemplate<CourseworkView.Model> implem
     @Autowired
     public CourseworkView(DisciplineService disciplineService,User currentUser) {
         this.disciplineService = disciplineService;
-        getModel().setThemePage(AppConst.PAGE_THEMES);
         getModel().setUserData(UserData.getInstance(currentUser));
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String str) {
-        Long aLong = null;
-        if(str != null)
-            aLong = Long.valueOf(BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.DISCIPLINE));
-        List<CourseWorkInfo> res = disciplineService.getCourseWorkInfoList(aLong == null?-1:  (aLong-1));
-        Model model = getModel();
+        Long indexDiscipline = BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.DISCIPLINE);
+        Long indexGroup = BreadCrumbs.parseIndex(str, BreadCrumbs.ParseIndexes.GROUP);
 
+        List<CourseWorkInfo> res = null;
+        try {
+            res = disciplineService.getCourseWorkInfoList(indexDiscipline,indexGroup);
+        } catch (Exception e) {
+            Notification.show(e.getMessage(),5000, Notification.Position.BOTTOM_START);
+            e.printStackTrace();
+        }
+        Model model = getModel();
+        getModel().setIndexData(IndexData.Instance(str));
         model.setCourseworkInfo(res);
     }
 
     public interface Model extends MainModel {
          void setCourseworkInfo(List<CourseWorkInfo> d);
-         void setThemePage(String d);
     }
 
     public static class CourseWorkInfo {
