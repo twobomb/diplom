@@ -3,10 +3,7 @@ package com.twobomb.service;
 import com.twobomb.Utils.AppConst;
 import com.twobomb.entity.*;
 import com.twobomb.repository.*;
-import com.twobomb.ui.pages.CourseworkView;
-import com.twobomb.ui.pages.DisciplinesView;
-import com.twobomb.ui.pages.GroupView;
-import com.twobomb.ui.pages.ThemeView;
+import com.twobomb.ui.pages.*;
 import com.vaadin.flow.component.notification.Notification;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -14,7 +11,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -871,6 +867,180 @@ public class DisciplineService {
             cd.setIs_student_offer(isStudentOffer);
             controlDisciplineRepository.saveAndFlush(cd);
         }
+    }
+    //endregion
+
+    //region Возвращает список всех  курсов
+    public List<String> getAllCourses(){
+        List<Group> groups = groupRepository.findAll();
+        List<String> courses = new ArrayList<>();
+        groups.forEach(group -> {
+            if(!courses.contains(String.valueOf(group.getCourse())))
+                courses.add(String.valueOf(group.getCourse()));
+        });
+        courses.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return Integer.valueOf(o1) > Integer.valueOf(o2)?1:Integer.valueOf(o1) < Integer.valueOf(o2)?-1:0;
+            }
+        });
+        return courses;
+    }
+    //endregion
+
+    //region Получить ВКР группы
+    public Discipline getVKR(Group g){
+        List<Discipline> list = g.getDisciplines();
+        list.removeIf(discipline -> !discipline.isVKR());
+        if(list.size() > 0)
+            return list.get(0);
+        return null;
+    }
+    //endregion
+
+    //region Получить лист информации о группах для отчета
+    public List<ReportView.ReportInfoGroups> getListReportInfoGroups() throws Exception {
+        List<ReportView.ReportInfoGroups> list = new ArrayList<>();
+        List<Group> groups = groupRepository.findAll();
+        groups.removeIf(group -> getVKR(group) == null);
+
+        int index = 1;
+        List<Group> mainListGroup = getMainListEntityByClass(Group.class);
+        for(Group g:groups){
+            ReportView.ReportInfoGroups info = new ReportView.ReportInfoGroups();
+            info.setGroup(g.getName());
+            info.setIndex(String.valueOf(index++));
+            info.setIndexOfMainList(mainListGroup.indexOf(g));
+            List<Person> personList = new ArrayList<>(getVKR(g).getCourseWork().get(0).getThemesWithAffixedStudent().values());
+            personList.removeIf(person -> !person.getGroup().equals(g));
+            info.setChecked(personList.size() == g.getPersons().size());
+            list.add(info);
+        }
+        return list;
+    }
+    //endregion
+
+    //region Получить хеш мапу для WordGenerator для шаблона с одной группой
+    public HashMap<String,Object> getSingleHashMapByGroupIndex(Long indexGroupOfMainList) throws Exception {
+        HashMap<String,Object> map = new HashMap<String,Object>();
+        Group group = getClassEntityByIndex(indexGroupOfMainList,Group.class);
+        Discipline vkr = getVKR(group);
+        if(vkr == null)
+            throw new Exception("У этой группы нет ВКР!");
+
+        map.put("code_group",group.getCipher());
+        map.put("group_name",group.getName());
+
+        Map<Theme, Person> affx =  vkr.getCourseWork().get(0).getThemesWithAffixedStudent();
+
+        List<String> name = new ArrayList<String>();
+        List<String> theme   = new ArrayList<String>();
+        List<String> head_teacher_name = new ArrayList<String>();
+        List<String> adviser_teacher_name = new ArrayList<String>();
+        int index = 1;
+        for(Person student:group.getPersons()){
+            name.add((index++)+".\t"+student.getLastname()+" "+student.getFirstname());
+            if(affx.values().contains(student)) {
+                for(Theme t: affx.keySet())
+                    if(affx.get(t).equals(student)) {
+                        theme.add(t.getText());
+                        head_teacher_name.add(t.getAdd_person().getLastname()+" "+t.getAdd_person().getFirstname());
+                        List<TeacherInfo> infos = t.getAdd_person().getTeacherInfos();
+                        boolean isHaveScienceAgreement = false;
+                        for(TeacherInfo inf: infos)
+                            if(inf.getCourseWork().equals(vkr.getCourseWork().get(0)) && inf.getSciece_agreement() != null){
+                                adviser_teacher_name.add(inf.getSciece_agreement().getLastname() + " "+ inf.getSciece_agreement().getFirstname());
+                                isHaveScienceAgreement  =true;
+                            }
+                        if(!isHaveScienceAgreement)
+                            adviser_teacher_name.add("");
+                        break;
+                    }
+            }
+            else {
+                theme.add("ТЕМА НЕ ВЫБРАНА");
+                head_teacher_name.add("ТЕМА НЕ ВЫБРАНА");
+                adviser_teacher_name.add("");
+            }
+
+        }
+        map.put("student_name",name);
+        map.put("student_theme",theme);
+        map.put("head_teacher_name",head_teacher_name);
+        map.put("adviser_teacher_name",adviser_teacher_name);
+
+        return map;
+    }
+    //endregion
+
+    // region Получить хеш мапу для WordGenerator для шаблона с несколькими группами
+    public HashMap<String,Object> getMultiHashMapByGroupIndex(List<Long> indexesGroupOfMainList) throws Exception {
+        HashMap<String,Object> map = new HashMap<String,Object>();
+        List<Group> groups = new ArrayList<>();
+        for(Long index:indexesGroupOfMainList)
+            groups.add(getClassEntityByIndex(index,Group.class));
+        for(Group g:groups) {
+            Discipline vkr = getVKR(g);
+            if(vkr == null)
+                throw new Exception("У этой группы нет ВКР!");
+        }
+        List<String> groupname  = new ArrayList<>();
+        List<String> groupcode  = new ArrayList<>();
+        List<List<String>> students  = new ArrayList<>();
+        List<List<String>> heads  = new ArrayList<>();
+        List<List<String>> advs  = new ArrayList<>();
+        List<List<String>> themes  = new ArrayList<>();
+
+        for(Group group:groups){
+            groupname.add(group.getName());
+            groupcode.add(group.getCipher());
+            List<String> g_students = new ArrayList<>();
+            List<String> g_heads = new ArrayList<>();
+            List<String> g_advs = new ArrayList<>();
+            List<String> g_themes = new ArrayList<>();
+
+            Map<Theme, Person> affx =  getVKR(group).getCourseWork().get(0).getThemesWithAffixedStudent();
+
+            int index = 1;
+            for(Person student:group.getPersons()){
+                g_students.add((index++)+".\t"+student.getLastname()+" "+student.getFirstname());
+                if(affx.values().contains(student)) {
+                    for(Theme t: affx.keySet())
+                        if(affx.get(t).equals(student)) {
+                            g_themes.add(t.getText());
+                            g_heads.add(t.getAdd_person().getLastname()+" "+t.getAdd_person().getFirstname());
+                            List<TeacherInfo> infos = t.getAdd_person().getTeacherInfos();
+                            boolean isHaveScienceAgreement = false;
+                            for(TeacherInfo inf: infos)
+                                if(inf.getCourseWork().equals(getVKR(group).getCourseWork().get(0)) && inf.getSciece_agreement() != null){
+                                    g_advs.add(inf.getSciece_agreement().getLastname() + " "+ inf.getSciece_agreement().getFirstname());
+                                    isHaveScienceAgreement  =true;
+                                }
+                            if(!isHaveScienceAgreement)
+                                g_advs.add("");
+                            break;
+                        }
+                }
+                else {
+                    g_themes.add("ТЕМА НЕ ВЫБРАНА");
+                    g_heads.add("ТЕМА НЕ ВЫБРАНА");
+                    g_advs.add("");
+                }
+            }
+
+            students.add(g_students);
+            heads.add(g_heads);
+            advs.add(g_advs);
+            themes.add(g_themes);
+        }
+
+        map.put("code_group",groupcode);
+        map.put("group_name",groupname);
+        map.put("student_name",students);
+        map.put("student_theme",themes);
+        map.put("head_teacher_name",heads);
+        map.put("adviser_teacher_name",advs);
+        return map;
     }
     //endregion
 }

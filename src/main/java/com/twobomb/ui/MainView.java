@@ -11,9 +11,11 @@ import java.util.regex.Pattern;
 
 import com.twobomb.Utils.AppConst;
 import com.twobomb.app.security.SecurityUtils;
+import com.twobomb.entity.User;
 import com.twobomb.ui.components.AppNavigation;
 import com.twobomb.ui.components.BreadCrumbs;
 import com.twobomb.ui.components.PageInfo;
+import com.twobomb.ui.pages.ReportView;
 import com.twobomb.ui.pages.error.AccessDeniedException;
 import com.twobomb.ui.pages.GroupView;
 import com.vaadin.flow.component.Tag;
@@ -30,6 +32,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.ui.UI;
 import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -50,7 +53,8 @@ public class MainView extends PolymerTemplate<TemplateModel>
     @Id("breadCrumbs")
     private BreadCrumbs breadCrumbs;
 
-    public MainView() {
+    @Autowired
+    public MainView(User currentUser) {
 
         List<PageInfo> pages = new ArrayList<>();
 
@@ -59,6 +63,11 @@ public class MainView extends PolymerTemplate<TemplateModel>
         pages.add(new PageInfo(PAGE_DISCIPLINES, ICON_DISCIPLINES, TITLE_DISCIPLINES));
         pages.add(new PageInfo(PAGE_COURSEWORKS, ICON_COURSEWORK, TITLE_COURSEWORK));
         pages.add(new PageInfo(PAGE_THEMES, ICON_THEMES, TITLE_THEMES));
+        //if(currentUser.getRole().isAdmin() || currentUser.getRole().isTeacher() || (currentUser.getRole().isStudent() && currentUser.getPerson().getGroup().getVkr()!=null))
+          //  pages.add(new PageInfo(PAGE_VKR, ICON_VKR, TITLE_VKR));
+
+        if (SecurityUtils.isAccessGranted(ReportView.class))
+            pages.add(new PageInfo(PAGE_REPORT, ICON_REPORT, TITLE_REPORT));
 
         pages.add(new PageInfo(PAGE_LOGOUT, ICON_LOGOUT, TITLE_LOGOUT));
 

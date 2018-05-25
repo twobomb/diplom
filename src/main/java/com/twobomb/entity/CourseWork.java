@@ -1,5 +1,8 @@
 package com.twobomb.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -15,7 +18,7 @@ public class CourseWork extends AbstractEntity {
     @Column(name="name")
     private String name;
 
-    @NotNull
+    //@NotNull
     @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     @JoinColumn(name = "id_discipline_load")
     private Discipline discipline;

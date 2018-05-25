@@ -41,4 +41,17 @@ public class TeacherInfo extends AbstractEntity{
     @JoinColumn(name = "id_coursework")
     @ManyToOne(cascade = {CascadeType.REFRESH,CascadeType.MERGE})
     CourseWork courseWork;
+
+
+    @JoinColumn(name = "id_sciece_agreement")
+    @OneToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
+    Person sciece_agreement;//Консультат, не обязательно (для ВКР)
+
+    public Person getSciece_agreement() {
+        return sciece_agreement;
+    }
+
+    public void setSciece_agreement(Person sciece_agreement) {
+        this.sciece_agreement = sciece_agreement;
+    }
 }

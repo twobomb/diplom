@@ -68,8 +68,7 @@ public class Theme extends AbstractEntity{
     @NotNull
     @JoinColumn(name = "id_add_person")
     @OneToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
-    Person add_person;
-
+    Person add_person;//Кто добавил он же руководитель
 
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
     @JoinTable(name = "theme_bind_coursework",

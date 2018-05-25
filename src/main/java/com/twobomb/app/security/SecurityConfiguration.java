@@ -39,7 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final String LOGIN_PROCESSING_URL = "/login";
     private static final String LOGIN_FAILURE_URL = "/login?error";
-    private static final String LOGIN_URL = "/login";
+    public static final String LOGIN_URL = "/login";
     private static final String LOGOUT_SUCCESS_URL = "/" + AppConst.PAGE_DEFAULT;
 
     @Autowired
@@ -128,7 +128,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 // Register the success handler that redirects users to the pages they last tried
                 // to access
-                .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+//                .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
 
                 // Configure logout
                 .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
@@ -141,6 +141,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(
                 "/VAADIN/**",
+                "/VAADIN/dynamic/resource/**",
+                 "/vaadinServlet/**",
                  "/images/**",
                 "/frontend/**",
                 "/webjars/**",

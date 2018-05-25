@@ -126,22 +126,22 @@
     <script>
         function linkIndexBuilder(indexData) {
             var link = "";
-            var groups = [];
+            var group = [];
             if(indexData != null){
                 if(indexData.indexGroup != null)
-                    groups.push("group"+indexData.indexGroup);
+                    group.push("group"+indexData.indexGroup);
 
                 if(indexData.indexDiscipline!= null)
-                    groups.push("discipline"+indexData.indexDiscipline);
+                    group.push("discipline"+indexData.indexDiscipline);
 
                 if(indexData.indexCoursework!= null)
-                    groups.push("coursework"+indexData.indexCoursework);
+                    group.push("coursework"+indexData.indexCoursework);
             }
-            for(var i = 0; i < groups.length;i++)
+            for(var i = 0; i < group.length;i++)
                 if(i!=0)
-                    link+="-"+groups[i];
+                    link+="-"+group[i];
                 else
-                    link+=groups[i];
+                    link+=group[i];
             return link;
         }
         class CourseworkView extends Polymer.Element {

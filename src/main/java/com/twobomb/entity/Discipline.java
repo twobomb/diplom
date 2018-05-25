@@ -1,5 +1,8 @@
 package com.twobomb.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -10,6 +13,11 @@ public class Discipline extends AbstractEntity{
 
     @Column(name = "name")
     String name;
+
+    @Column(name = "is_vkr")
+    @ColumnDefault("FALSE")
+    @Type(type="boolean")
+    private Boolean isVKR;
 
     @OneToOne(mappedBy = "discipline",fetch = FetchType.EAGER)
     ControlDiscipline control_discipline;
@@ -30,8 +38,21 @@ public class Discipline extends AbstractEntity{
 
     public Discipline(String name) {
         this.name = name;
+        isVKR = false;
     }
 
+    public Discipline(String name, Boolean isVKR) {
+        this.name = name;
+        this.isVKR = isVKR;
+    }
+
+    public Boolean isVKR() {
+        return isVKR;
+    }
+
+    public void setVKR(Boolean VKR) {
+        isVKR = VKR;
+    }
 
     public List<Group> getGroups() {
         return groups;
@@ -45,6 +66,7 @@ public class Discipline extends AbstractEntity{
 
 
     public Discipline() {
+        isVKR = false;
     }
 
     public ControlDiscipline getControl_discipline() {

@@ -24,6 +24,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 
+@SuppressWarnings("ControlFlowStatementWithoutBraces")
 @SpringComponent
 public class DataGeneration {
 
@@ -59,16 +60,23 @@ public class DataGeneration {
     rnd  = new Random();
     }
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean;
 
+
+    //region НАСТРОЙКИ РАНДОМАЙЗЕРА
+    private final double PER_STUDENT_BIND_TO_FREE_THEME  = 1;//[0-1] кол-во % что студент будет привязан к свободной теме
+    private final String TEACHER_COUNT_ADD_THEMES  = "ALL";//сколько тем преподаватель добавит к привязанных курсовым, ALL - все, RND - рандом
+    //endregion
 
     @Autowired
     Environment environment;
     @PostConstruct
     public void create(){
         //Если типа update То генератор не сработает
-        if(environment.getProperty("spring.jpa.properties.hibernate.hbm2ddl.auto").equals("update"))
+        if(environment.getProperty("spring.jpa.properties.hibernate.hbm2ddl.auto").equals("update") ||
+                environment.getProperty("spring.jpa.properties.hibernate.hbm2ddl.auto").equals("none"))
             return;
         createRoles();
         createUsers();
@@ -78,6 +86,8 @@ public class DataGeneration {
 
         createDisciplines();
         createCourseworks();
+        //Создать ВКР для 4х курсов
+        createVKR();
 
         //Привязка преподователей к дисциплинам
         bindTeacherToDisciplines();
@@ -95,8 +105,29 @@ public class DataGeneration {
         //Привязывает студентов к темам
         bindStudentsToTheme();
 
-    }
 
+    }
+    public void createVKR(){
+        SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
+        Session session = sessionFactory.openSession();
+        try {
+            List<Person> personList = personService.getByRole(Role.TEACHER);
+
+            List<Discipline> disciplineList = discinplineRepository.findAll();
+            disciplineList.removeIf(discipline -> !discipline.isVKR());
+            for(Discipline d:disciplineList){
+                courseworkRepository.save(new CourseWork("Выпускная квалификационная работа",d));
+            }
+            courseworkRepository.flush();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            session.close();
+        }
+
+    }
     private void bindStudentsToTheme() {
         SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
         Session session = sessionFactory.openSession();
@@ -111,8 +142,8 @@ public class DataGeneration {
                 for(Group group:groupList){
                     List<Theme> freeThemes = disciplineService.getFreeThemeListFromCoursework(cw,group);
                     for(Person student:group.getPersons()){
-                        //50% что студент будет привязан к теме
-                        if(freeThemes.size()>0 && rnd.nextBoolean() ){
+                        //PER_STUDENT_BIND_TO_FREE_THEME % что студент будет привязан к теме
+                        if(freeThemes.size()>0 && rnd.nextDouble() < PER_STUDENT_BIND_TO_FREE_THEME ){
                             Theme rndTheme = freeThemes.get(rnd.nextInt(freeThemes.size()));
                             freeThemes.remove(rndTheme);
                             rndTheme.addAttachStudentAndCoursework(student,cw);
@@ -172,7 +203,14 @@ public class DataGeneration {
                                 break;
                             }
                         //Генерирует темы от 0 до количества*2
-                        int generationThemesCount = rnd.nextInt(countThemes * 2 + 1);
+                        int generationThemesCount = 0;
+                        switch (TEACHER_COUNT_ADD_THEMES) {
+                            case "ALL":
+                                generationThemesCount = countThemes;
+                                break;
+                            case "RND":default:
+                             generationThemesCount = rnd.nextInt(countThemes * 2 + 1);
+                        }
                         for (int i = 0; i < generationThemesCount; i++) {
                             String desc = description.substring(0, rnd.nextInt(description.length()));
                             //30% Что у темы нет описания
@@ -206,12 +244,17 @@ public class DataGeneration {
         List<Discipline> disciplineList = discinplineRepository.findAll();
         for(Discipline d:disciplineList) {
             int cnt = 0;
-            for (User u : users)
+            for (User u : users) {
+                if(u.getLogin().equals("teacher") && d.isVKR()) {
+                    disciplineService.attachTeacher(u.getPerson(), d);
+                    continue;
+                }
                 //20% что эта дисциплина будет привязна к любому преподу
                 if (rnd.nextDouble() < 0.20) {
                     disciplineService.attachTeacher(u.getPerson(), d);
                     cnt++;
                 }
+            }
                 //Если к дисциплине не привязался не один препод, привязать вручную одного случайного
             if(cnt == 0 && users.size() > 0)
                 disciplineService.attachTeacher(users.get(rnd.nextInt(users.size())).getPerson(), d);
@@ -221,14 +264,24 @@ public class DataGeneration {
     public void bindGroupsToDisciplines(){
         List<Group> list = groupRepository.findAll();
         List<Discipline> disciplineList = discinplineRepository.findAll();
+        disciplineList.removeIf(discipline -> discipline.isVKR());
         for(Discipline d:disciplineList)
             for(Group g:list)
                 //50% что эта дисциплина будет группе
                 if(rnd.nextDouble() < 0.50)
                     disciplineService.attachGroup(g,d);
+
+        disciplineList = discinplineRepository.findAll();
+        Discipline vkr = null;
+        for(Discipline d:disciplineList)
+            if(d.isVKR())
+                for(Group g:list)//привязка к 4м курсам дисциплины вкр
+                    if(g.getCourse().equals(4))
+                        disciplineService.attachGroup(g,d);
     }
     public void createCourseworks(){
             List<Discipline> disciplineList = discinplineRepository.findAll();
+            disciplineList.removeIf(discipline -> discipline.isVKR());
             for(Discipline d:disciplineList){
                 double r = rnd.nextDouble();
                 int cntCourseWork;
@@ -268,6 +321,8 @@ public class DataGeneration {
         SessionFactory sessionFactory =  localContainerEntityManagerFactoryBean.getObject().unwrap(SessionFactory.class);
         Session session = sessionFactory.openSession();
         try {
+            boolean need_sciece_agreement = true;//Устанавливать каждому второму преподу научного помощника
+            List<Person> allTeachers = personService.getByRole(Role.TEACHER);
             List<Discipline> disciplineList = disciplineService.getAll();
             for (Discipline d : disciplineList) {
                 d = session.get(d.getClass(), d.getId());
@@ -289,7 +344,13 @@ public class DataGeneration {
                         else
                             tmpCount = rnd.nextInt(maxStudentsInGroup - curCount + 1);///warn check
                         Person t = teachers.get(i);
-                        teacherInfoRepository.save(new TeacherInfo(tmpCount, t, cw));
+                        TeacherInfo ti = new TeacherInfo(tmpCount, t, cw);
+                        if(d.isVKR()) {
+                            if(need_sciece_agreement)
+                                ti.setSciece_agreement(allTeachers.get(rnd.nextInt(allTeachers.size())));
+                            need_sciece_agreement = !need_sciece_agreement;
+                        }
+                        teacherInfoRepository.save(ti);
                         curCount += tmpCount;
                     }
                 }
@@ -307,6 +368,7 @@ public class DataGeneration {
     }
     public void createDisciplines(){
         String[] disc = new String[]{"Программирование","Архитектура вычислительных систем","Дискретная математика","Теория алгоритмов и математическая логика","Операционные системы","Программное обеспечение вычислительных систем","Алгоритмы и структуры данных","Математическая статистика","Методы вычислений","Компьютерные сети","Объектно-ориентированное программирование","Анализ данных","Базы данных и информационные системы","Теория игр","Современные средства проектирования программного обеспечения","Методы оптимизации","Защита информации","Теория программирования","Системы и методы принятия решений","Теория графов","Теория управления","Вычислительная геометрия и компьютерная графика"};
+        discinplineRepository.save(new Discipline("ВКР",true));
         for(String d:disc)
             discinplineRepository.save(new Discipline(d));
         discinplineRepository.flush();

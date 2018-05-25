@@ -1,0 +1,112 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-password-field.html">
+<link rel="import" href="../bower_components/vaadin-icons/vaadin-icons.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
+<link rel="import" href="../bower_components/vaadin-checkbox/vaadin-checkbox.html">
+<link rel="import" href="../bower_components/vaadin-upload/vaadin-upload.html">
+
+<dom-module id="report-view">
+    <template>
+        <style>
+            vaadin-grid{
+                height: 200px;
+            }
+            form{
+                margin: auto;
+                max-width: 500px;
+            }
+            form>*{
+                display: block;
+            }
+            h2{
+                text-align: center;
+            }
+        </style>
+        <iron-form>
+            <form>
+                <!--<vaadin-combo-box label="Выберите курс" id="courseSelect" required error-message="Выберите элемент"></vaadin-combo-box>-->
+                <h2>Отчет</h2>
+                <vaadin-checkbox id="multiSelect">
+                    <iron-icon icon="vaadin:users" style="vertical-align: top;"></iron-icon>
+                    Много групп
+                    <br>
+                    <small>Отчет для одной или многих групп</small>
+                </vaadin-checkbox>
+
+                    <vaadin-grid id="grid" aria-label="Multi-Selection" label="Выберите группы">
+                    </vaadin-grid>
+
+                    <vaadin-checkbox checked  id="isDefaultPattern">
+                        <iron-icon icon="vaadin:file-code" style="vertical-align: top;"></iron-icon>
+                        Стандартный шаблон
+                        <br>
+                        <small>Используйте стандартный шаблон или загрузить свой</small>
+                    </vaadin-checkbox>
+                    <vaadin-upload id="uploadPattern" max-files="1" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document" >
+                        <span slot="drop-label">Выберите шаблон в формате *.docx</span>
+                    </vaadin-upload>
+                    <vaadin-button id="createReport" on-click="createReport">Получить отчет</vaadin-button>
+            </form>
+        </iron-form>
+
+
+    </template>
+    <script>
+        class ReportView extends Polymer.Element{
+            static get is(){ return "report-view"; }
+
+            connectedCallback() {
+                super.connectedCallback();
+                var upload = this.$.uploadPattern;
+                upload.i18n = {
+                    dropFiles: {
+                        one: 'Перетащите файл сюда',
+                        many: 'Перетащите файлы сюда'
+                    },
+                    addFiles: {
+                        one: 'Выбрать файл...',
+                        many: 'Добавить файлы...'
+                    },
+                    cancel: 'Отменить',
+                    error: {
+                        tooManyFiles: 'Слишком много файлов.',
+                        fileIsTooBig: 'Слишком большой файл.',
+                        incorrectFileType: 'Некорректный тип файла.'
+                    },
+                    uploading: {
+                        status: {
+                            connecting: 'Соединение...',
+                            stalled: 'Загрузка застопорилась.',
+                            processing: 'Обработка файла...'
+                        },
+                        remainingTime: {
+                            prefix: 'оставшееся время: ',
+                            unknown: 'оставшееся время неизвестно'
+                        },
+                        error: {
+                            serverUnavailable: 'Сервер недоступен',
+                            unexpectedServerError: 'Неожиданная ошибка сервера',
+                            forbidden: 'Загрузка запрещена'
+                        }
+                    },
+                    units: {
+                        size: ['Б', 'Кбайт', 'Мбайт', 'Гбайт', 'Тбайт', 'Пбайт', 'Эбайт', 'Збайт', 'Ибайт']
+                    }
+                };
+            }
+            static get properties() {
+                return {
+                };
+            }
+
+        }
+        window.customElements.define(ReportView.is, ReportView);
+    </script>
+</dom-module>

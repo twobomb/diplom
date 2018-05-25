@@ -27,6 +27,14 @@ public class Person extends AbstractEntity{
     @JoinColumn(name = "user_id")
     @OneToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     User user;
+/*
+    @JoinColumn(name = "sciece_agreement_id")
+    @OneToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
+    List<VKR> vkrs_when_i_agreement;
+
+    @JoinColumn(name = "sciece_head_id")
+    @OneToMany(cascade = {CascadeType.MERGE,CascadeType.REFRESH})
+    List<VKR> vkrs_when_i_head;*/
 
     @JoinColumn(name = "group_id")
     @ManyToOne(cascade =  {CascadeType.MERGE,CascadeType.REFRESH})
